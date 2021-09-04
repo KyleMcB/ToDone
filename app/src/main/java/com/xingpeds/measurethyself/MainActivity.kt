@@ -9,6 +9,10 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,12 +20,16 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.xingpeds.measurethyself.ui.theme.MeasurethyselfTheme
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -30,22 +38,36 @@ import kotlinx.datetime.periodUntil
 class DataModel(application: Application) : AndroidViewModel(application) {
     val source: SourceJson = PersistJsonSource(application).load()
     val list = mutableStateOf(source, neverEqualPolicy())
-    fun createTask(name: String, description: Description, unit: String, defaultAmount: Int) =
-        source.createTask(name, description, unit, defaultAmount).let { list.value = list.value }
+    fun createTask(name: String, description: String, unit: String, defaultAmount: Int) {
+        val descString: String? = if (description.isBlank()) null else description
+        if (name.isBlank() || unit.isBlank() || defaultAmount == 0) return
+        source.createTask(name, Description(descString), unit, defaultAmount)
+        save()
+        list.value = list.value
+    }
+
+    fun save() {
+        // PersistJsonSource(context = applicationContext).save(model.source)
+        viewModelScope.launch { PersistJsonSource(context = getApplication()).save(source) }
+    }
 }
 
 @Composable
 fun NewTaskDialog(
     onClose: () -> Unit,
-    onCreate: (name: String, description: Description, unit: String, defaultAmount: Int) -> Unit
+    onCreate: (name: String, description: String, unit: String, defaultAmount: Int) -> Unit
 ) {
-    SourceJson().createTask("aTask", Description("aDescription"), "miles", 30)
     Dialog(onDismissRequest = onClose) {
         var name: String by remember { mutableStateOf("") }
         var description: String by remember { mutableStateOf("") }
         var unit: String by remember { mutableStateOf("") }
         var amount: Int by remember { mutableStateOf(0) }
-        Column(Modifier.background(Color.White).padding(5.dp)) {
+        Column(
+            Modifier.clip(RoundedCornerShape(5))
+                .background(Color.White)
+                .padding(5.dp)
+                .wrapContentSize()
+        ) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -67,13 +89,62 @@ fun NewTaskDialog(
             val amountText: String = if (amount == 0) "" else amount.toString()
             OutlinedTextField(
                 value = amountText,
-                onValueChange = { amount = it.toInt() },
+                onValueChange = { amount = it.toIntOrNull() ?: 0 },
                 label = { Text("Measurement default") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             TextButton(
-                onClick = { /*TODO*/},
+                onClick = {
+                    onCreate(name, description, unit, amount)
+                    onClose()
+                },
                 modifier = Modifier.align(Alignment.End).padding(5.dp)
             ) { Text("Create Task") }
+        }
+    }
+}
+
+@Composable
+fun ShowCompDialog(mtask: MutableState<Task>, show: MutableState<Boolean>) {
+    if (show.value) {
+        DetailedTaskCompletionDialog(
+            onDismiss = { show.value = false },
+            onCreate = { units, description ->
+                mtask.value.createCompletion(units, Description(description))
+                mtask.value = mtask.value
+            }
+        )
+    }
+}
+
+@Composable
+fun DetailedTaskCompletionDialog(
+    defaultAmount: Int = 0,
+    onDismiss: () -> Unit,
+    onCreate: (units: Int, description: String?) -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        var units: Int by remember { mutableStateOf(defaultAmount) }
+        var description: String by remember { mutableStateOf("") }
+        Column(modifier = Modifier.wrapContentSize(Alignment.Center).background(Color.White)) {
+            OutlinedTextField(
+                value = units.toString(),
+                onValueChange = { units = it.toIntOrNull() ?: 0 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("Measured Amount") }
+            )
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Description") },
+                singleLine = true,
+            )
+            TextButton(
+                onClick = {
+                    onCreate(units, if (description.isBlank()) null else description)
+                    onDismiss()
+                }
+            ) { Text("Did it!") }
         }
     }
 }
@@ -95,16 +166,26 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) {
-                    Column() {
-                        if (openDialog.value) {
-                            NewTaskDialog(
-                                onClose = { openDialog.value = false },
-                                onCreate = model::createTask
-                            )
-                        }
-                        model.list.value.map { mutableStateOf(it, neverEqualPolicy()) }.forEach {
+                    if (openDialog.value) {
+                        NewTaskDialog(
+                            onClose = { openDialog.value = false },
+                            onCreate = model::createTask
+                        )
+                    }
+
+                    LazyColumn() {
+                        items(model.list.value.map { mutableStateOf(it, neverEqualPolicy()) }) {
                             stateTask ->
-                            Task(mtask = stateTask)
+                            var detialCompDialog = mutableStateOf(false)
+                            Task(
+                                mtask = stateTask,
+                                {
+                                    stateTask.value.createCompletion()
+                                    model.save()
+                                },
+                                modifier = Modifier.clickable { detialCompDialog.value = true }
+                            )
+                            ShowCompDialog(mtask = stateTask, show = detialCompDialog)
                         }
                     }
                 }
@@ -120,24 +201,33 @@ class MainActivity : ComponentActivity() {
 
 @ExperimentalMaterialApi
 @Composable
-fun Task(mtask: MutableState<Task>) {
+fun Task(mtask: MutableState<Task>, onCreateCompletion: () -> Unit, modifier: Modifier = Modifier) {
     val task = mtask.value
-    val description: String = task.lastOrNull()?.desc?.text ?: "no description"
-    //    val previous:String = task.lastOrNull()?.timeStamp
+
     ListItem(
-        modifier = Modifier.clickable { /* TODO detail pane here */},
+        modifier = modifier,
         text = { Text(text = task.name) },
-        overlineText = { task.lastOrNull()?.desc?.text?.let { Text(it) } },
+        overlineText = { if (task.lastOrNull() != null) PreviousCompTime(comp = task.last()) },
         trailing = {
             IconButton(
                 onClick = {
-                    task.createCompletion()
+                    onCreateCompletion()
                     mtask.value = task
                 }
             ) { Icon(imageVector = Icons.Default.Done, contentDescription = "create Completion") }
         },
-        secondaryText = { if (task.lastOrNull() != null) PreviousComp(comp = task.last()) }
+        secondaryText = { LastCompDescription(task = task) }
     )
+}
+
+@Composable
+fun LastCompDescription(task: Task) {
+    val comps = task.filterNotNull()
+    if (comps.isNotEmpty() && comps.last().desc.text != null) {
+        Text("Last ->" + comps.last().desc.text!!)
+    } else if (task.desc.text != null) {
+        Text(task.desc.text!!)
+    }
 }
 
 @ExperimentalMaterialApi
@@ -160,12 +250,12 @@ fun TaskPreview() {
                         )
                     )
                 }
-        Task(mutableStateOf(task, neverEqualPolicy()))
+        Task(mutableStateOf(task, neverEqualPolicy()), {})
     }
 }
 
 @Composable
-fun PreviousComp(comp: Completion) {
+fun PreviousCompTime(comp: Completion) {
     val timeDistance =
         comp.timeStamp.periodUntil(Clock.System.now(), TimeZone.currentSystemDefault())
     val build: StringBuilder = StringBuilder()
@@ -176,10 +266,7 @@ fun PreviousComp(comp: Completion) {
         if (timeDistance.hours > 0) append("${timeDistance.hours} hours ")
         if (this.any()) append("ago") else append("completed recently")
     }
-    Column() {
-        Text(build.toString())
-        comp.desc.text?.let { Text(it) }
-    }
+    Column() { Text(build.toString()) }
 }
 
 @ExperimentalMaterialApi
@@ -201,7 +288,7 @@ fun ListTest() {
 @Preview
 @Composable
 fun PreviewLastComp() {
-    PreviousComp(
+    PreviousCompTime(
         comp = CompJson(30, Instant.parse("2020-01-01T00:00:00Z"), Description("washed the dishes"))
     )
 }
