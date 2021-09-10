@@ -28,7 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.xingpeds.measurethyself.ui.theme.MeasurethyselfTheme
+import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -152,10 +157,20 @@ fun DetailedTaskCompletionDialog(
 class MainActivity : ComponentActivity() {
     private val model: DataModel by viewModels<DataModel>()
 
+    @ExperimentalTime
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
+        val notifyWorkRequest =
+            PeriodicWorkRequestBuilder<AbsentNotifyWorker>(8, TimeUnit.HOURS, 1, TimeUnit.HOURS)
+                .build()
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                AbsentNotifyWorker.workName,
+                ExistingPeriodicWorkPolicy.REPLACE,
+                notifyWorkRequest
+            )
+
         setContent {
             val openDialog = remember { mutableStateOf(false) }
             MeasurethyselfTheme {
