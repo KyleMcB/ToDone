@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
             MeasurethyselfTheme {
                 NavHost(navController = navController, startDestination = "tasklist") {
                     composable("tasklist") { TaskListScreen(model, navController) }
-                    composable("friendslist") {
+                    composable("friendsList") {
                         StatsList(dataModel = model, navController = navController)
                     }
                     /*...*/
@@ -59,10 +60,23 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun StatsList(dataModel: DataModel, navController: NavController) {
     Scaffold(topBar = { AppBarNavigation(navController = navController) }) {
-        //
+        dataModel.source.map { mutableStateOf(it, neverEqualPolicy()) }.forEach { stateTask ->
+            var detialCompDialog = mutableStateOf(false)
+            // possibly fragile code, can't call Task(task,{},modifier) directly
+            TaskQuickComplete(
+                mtask = stateTask,
+                {
+                    stateTask.value.createCompletion()
+                    dataModel.save()
+                },
+                modifier = Modifier.clickable { detialCompDialog.value = true }
+            )
+            ShowCompDialog(mtask = stateTask, show = detialCompDialog)
+        }
     }
 }
 
@@ -74,7 +88,7 @@ fun Task(task: Task, TrailingButton: @Composable () -> Unit, modifier: Modifier 
         modifier = modifier,
         text = { Text(text = task.name) },
         overlineText = { if (task.lastOrNull() != null) PreviousCompTime(comp = task.last()) },
-        trailing = TrailingButton,
+        trailing = { TrailingButton() },
         secondaryText = { LastCompDescription(task = task) }
     )
 }

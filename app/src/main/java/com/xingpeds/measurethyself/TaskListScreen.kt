@@ -127,7 +127,7 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
     Scaffold(
         topBar = { AppBarNavigation(navController = navController) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("friendslist") }) {
+            FloatingActionButton(onClick = { openDialog.value = true }) {
                 Icon(imageVector = Icons.Default.Add, null)
             }
         }

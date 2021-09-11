@@ -16,7 +16,7 @@ fun AppBarNavigation(navController: NavController) {
     TopAppBar(
         title = { Text("Simple TopAppBar") },
         navigationIcon = {
-            IconButton(onClick = { /* doSomething() */}) {
+            IconButton(onClick = { TODO("show navigation draw not implemented") }) {
                 Icon(Icons.Filled.Menu, contentDescription = null)
             }
         },
@@ -25,7 +25,7 @@ fun AppBarNavigation(navController: NavController) {
             IconButton(onClick = { navController.navigate("taskList") }) {
                 Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = { navController.navigate("friendsList") }) {
                 Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
             }
         }
