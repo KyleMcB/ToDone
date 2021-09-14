@@ -4,12 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,6 +15,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.xingpeds.measurethyself.ui.theme.MeasurethyselfTheme
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
@@ -43,12 +42,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             MeasurethyselfTheme {
-                NavHost(navController = navController, startDestination = "tasklist") {
-                    composable("tasklist") { TaskListScreen(model, navController) }
-                    composable("friendsList") {
+                NavHost(navController = navController, startDestination = mainScreenRoute) {
+                    composable(mainScreenRoute) { TaskListScreen(model, navController) }
+                    composable(statsListScreenRoute) {
                         StatsList(dataModel = model, navController = navController)
                     }
-                    /*...*/
+                    composable("/task/{taskId}") {
+                        DetailTaskScreen(
+                            dataModel = model,
+                            navController = navController,
+                            it.arguments?.getString("taskId").toUUID()
+                        )
+                    }
                 }
             }
         }
@@ -60,29 +65,19 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@ExperimentalMaterialApi
-@Composable
-fun StatsList(dataModel: DataModel, navController: NavController) {
-    Scaffold(topBar = { AppBarNavigation(navController = navController) }) {
-        dataModel.source.map { mutableStateOf(it, neverEqualPolicy()) }.forEach { stateTask ->
-            var detialCompDialog = mutableStateOf(false)
-            // possibly fragile code, can't call Task(task,{},modifier) directly
-            TaskQuickComplete(
-                mtask = stateTask,
-                {
-                    stateTask.value.createCompletion()
-                    dataModel.save()
-                },
-                modifier = Modifier.clickable { detialCompDialog.value = true }
-            )
-            ShowCompDialog(mtask = stateTask, show = detialCompDialog)
-        }
-    }
+private fun String?.toUUID(): UUID {
+    if (this != null) {
+        return UUID.fromString(this)
+    } else return UUID.randomUUID()
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun Task(task: Task, TrailingButton: @Composable () -> Unit, modifier: Modifier = Modifier) {
+fun TaskListItem(
+    task: Task,
+    TrailingButton: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     ListItem(
         modifier = modifier,

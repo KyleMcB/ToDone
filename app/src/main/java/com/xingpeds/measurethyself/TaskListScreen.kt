@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 
+const val mainScreenRoute = "mainScreenRoute"
+
 @Composable
 fun NewTaskDialog(
     onClose: () -> Unit,
@@ -163,7 +165,7 @@ fun TaskQuickComplete(
 ) {
     val task = mtask.value
 
-    Task(
+    TaskListItem(
         task,
         {
             IconButton(

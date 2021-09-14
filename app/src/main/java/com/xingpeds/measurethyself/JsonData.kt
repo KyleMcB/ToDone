@@ -50,6 +50,10 @@ data class TaskJson(
         return comp
     }
 
+    override fun get(i: Int): Completion {
+        return comps.get(i)
+    }
+
     override fun hashCode(): Int {
         return id.hashCode()
     }

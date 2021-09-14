@@ -4,7 +4,6 @@ import java.util.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-
 @Serializable data class Description(var text: String? = null, var picture: String? = null)
 
 sealed interface Completion {
@@ -23,6 +22,8 @@ sealed interface Task : MutableCollection<Completion> {
         units: Int = defaultAmount,
         description: Description = Description()
     ): Completion
+
+    operator fun get(i: Int): Completion
 }
 
 sealed interface Source : MutableSet<Task> {

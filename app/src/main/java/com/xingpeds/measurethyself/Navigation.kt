@@ -16,16 +16,16 @@ fun AppBarNavigation(navController: NavController) {
     TopAppBar(
         title = { Text("Simple TopAppBar") },
         navigationIcon = {
-            IconButton(onClick = { TODO("show navigation draw not implemented") }) {
+            IconButton(onClick = { TODO("show navigation drawer open") }) {
                 Icon(Icons.Filled.Menu, contentDescription = null)
             }
         },
         actions = {
             // RowScope here, so these icons will be placed horizontally
-            IconButton(onClick = { navController.navigate("taskList") }) {
+            IconButton(onClick = { navController.navigate(mainScreenRoute) }) {
                 Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
             }
-            IconButton(onClick = { navController.navigate("friendsList") }) {
+            IconButton(onClick = { navController.navigate(statsListScreenRoute) }) {
                 Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
             }
         }
