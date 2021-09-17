@@ -147,6 +147,7 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
                     {
                         stateTask.value.createCompletion()
                         dataModel.save()
+                        stateTask.value = stateTask.value
                     },
                     modifier = Modifier.clickable { detialCompDialog.value = true }
                 )
