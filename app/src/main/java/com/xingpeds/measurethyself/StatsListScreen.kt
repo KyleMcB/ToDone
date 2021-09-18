@@ -1,10 +1,8 @@
 package com.xingpeds.measurethyself
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
@@ -20,7 +18,12 @@ const val statsListScreenRoute = "statsListScreenRoute"
 @ExperimentalMaterialApi
 @Composable
 fun StatsList(dataModel: DataModel, navController: NavController) {
-    Scaffold(topBar = { AppBarNavigation(navController = navController) }) {
+    val scaffoldState = rememberScaffoldState()
+    Scaffold(
+        scaffoldState = scaffoldState,
+        drawerContent = { DrawerContent(navController = navController) },
+        topBar = { AppBarNavigation(scaffoldState = scaffoldState) }
+    ) {
         Column() {
             //
 
@@ -53,6 +56,6 @@ fun TaskQuickStats(
                 )
             }
         },
-        modifier
+        modifier.clickable { goToDetails(task.id) }
     )
 }

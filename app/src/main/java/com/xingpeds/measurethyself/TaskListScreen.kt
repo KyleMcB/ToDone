@@ -126,8 +126,12 @@ fun DetailedTaskCompletionDialog(
 @Composable
 fun TaskListScreen(dataModel: DataModel, navController: NavController) {
     val openDialog = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
     Scaffold(
-        topBar = { AppBarNavigation(navController = navController) },
+        scaffoldState = scaffoldState,
+        topBar = { AppBarNavigation(scaffoldState = scaffoldState) },
+        drawerContent = { DrawerContent(navController = navController) },
         floatingActionButton = {
             FloatingActionButton(onClick = { openDialog.value = true }) {
                 Icon(imageVector = Icons.Default.Add, null)
