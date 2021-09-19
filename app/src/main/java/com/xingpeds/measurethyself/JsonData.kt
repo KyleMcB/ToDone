@@ -1,6 +1,9 @@
 package com.xingpeds.measurethyself
 
 import java.util.*
+import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -33,6 +36,7 @@ class UUIDSerializer : KSerializer<UUID> {
     }
 }
 
+@ExperimentalTime
 @Serializable
 data class TaskJson(
     override var name: String,
@@ -49,6 +53,74 @@ data class TaskJson(
         comps.add(comp)
         return comp
     }
+
+    override val avgCompPerWeek: Float
+        get() {
+            if (this.isEmpty()) return 0f
+            val numOfDays = this.daysSinceCreated
+            val numOfWeeks: Float = numOfDays.toFloat() / 7f
+
+            return this.size / numOfWeeks
+        }
+    override val avgCompPer30Days: Float
+        get() {
+            if (this.isEmpty()) return 0f
+            val numOf30Days = this.daysSinceCreated / 30f
+            return this.size / numOf30Days
+        }
+    val compsLast7days: List<Completion>
+        get() =
+            this.filter {
+                it.timeStamp in Clock.System.now() - Duration.days(7)..Clock.System.now()
+            }
+    override val daysSinceCreated: Long
+        get() {
+            val list = this.sortedBy { it.timeStamp }
+            return (Clock.System.now() - list.first().timeStamp).inWholeDays
+        }
+    val weeksSinceCreated: Long
+        get() {
+            return daysSinceCreated / 7
+        }
+    override val numOfCompsLast7Days: Int
+        get() = this.compsLast7days.size
+
+    val compsLast30days: List<Completion>
+        get() =
+            this.filter {
+                it.timeStamp in Clock.System.now() - Duration.days(30)..Clock.System.now()
+            }
+    override val numOfCompsLast30Days: Int
+        get() = this.compsLast30days.size
+    override val unitsInLast7Days: Int
+        get() = this.compsLast7days.sumOf { it.units }
+    override val unitsInLast30Days: Int
+        get() = this.compsLast30days.sumOf { it.units }
+    override val stdDev7days: Float
+        get() {
+            if (this.isEmpty() || this.size == 1) return 0f
+            val weeks = unitsPerWeek
+            val mean: Float = weeks.sum().toFloat() / weeks.size.toFloat()
+            val weekDeviations: List<Float> =
+                List<Float>(weeks.size) {
+                    val dev = weeks[it] - mean
+                    (dev * dev)
+                }
+            return sqrt(weekDeviations.sum().toFloat() / (weekDeviations.size.toFloat() - 1f))
+        }
+    override val stdDev30days: Float
+        get() = TODO("Not yet implemented")
+    override val unitsPerWeek: List<Int>
+        get() {
+            if (this.isEmpty()) return emptyList()
+            val days = daysSinceCreated
+            val weeks: MutableList<Int> = MutableList<Int>(weeksSinceCreated.toInt() + 1) { 0 }
+            forEach {
+                val week: Int = (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / 7
+                weeks[week] += it.units
+            }
+            return weeks.toList()
+        }
 
     override fun get(i: Int): Completion {
         return comps.get(i)
@@ -89,6 +161,7 @@ data class TaskJson(
     override fun retainAll(elements: Collection<Completion>) = comps.retainAll(elements)
 }
 
+@OptIn(kotlin.time.ExperimentalTime::class)
 @Serializable
 class SourceJson : Source {
     // not going to serialize properly...
@@ -118,9 +191,9 @@ class SourceJson : Source {
 
     override fun add(element: Task): Boolean {
 
-        if (element is TaskJson) {
+        return if (element is TaskJson) {
             tasks.add(element)
-            return true
+            true
         } else {
             tasks.add(
                 TaskJson(
@@ -131,7 +204,7 @@ class SourceJson : Source {
                     element.id
                 )
             )
-            return true
+            true
         }
     }
 

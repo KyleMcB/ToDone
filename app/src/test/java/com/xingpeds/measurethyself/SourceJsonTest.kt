@@ -4,11 +4,13 @@ import com.xingpeds.measurethyself.Description
 import com.xingpeds.measurethyself.SourceJson
 import com.xingpeds.measurethyself.TaskJson
 import java.util.*
+import kotlin.time.ExperimentalTime
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
 
+@ExperimentalTime
 internal class SourceJsonTest {
     val task1 = TaskJson("task1", Description(), "minutes", 30)
     val task2 = TaskJson("task2", Description("another task"), "meals", 1)

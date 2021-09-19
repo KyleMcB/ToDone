@@ -4,13 +4,17 @@ import com.xingpeds.measurethyself.CompJson
 import com.xingpeds.measurethyself.Description
 import com.xingpeds.measurethyself.TaskJson
 import java.util.UUID
+import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.junit.Assert.*
 import org.junit.Test
 
-import org.junit.Assert.*
-
+@OptIn(kotlin.time.ExperimentalTime::class)
 internal class TaskJsonTest {
 
     val taskNoComps: TaskJson =
@@ -116,5 +120,79 @@ internal class TaskJsonTest {
         val description = Description("first!", "link to picture")
         val comp = taskNoComps.createCompletion(units, description = description)
         assert(comp.desc == description && comp.units == units)
+    }
+
+    @ExperimentalTime
+    @Test
+    fun avgCompsPerWeeks() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals("task with no completions has average of zero", 0f, task.avgCompPerWeek)
+        val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
+        task.add(comp1)
+        assertEquals(7f / 9f, task.avgCompPerWeek)
+    }
+    @ExperimentalTime
+    @Test
+    fun avgCompsPer30days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0f, task.avgCompPer30Days)
+        val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
+        task.add(comp1)
+        assertEquals(30f / 9f, task.avgCompPer30Days)
+    }
+    @Test
+    fun compsLast7Days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0, task.numOfCompsLast7Days)
+        val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
+        task.add(comp1)
+        assertEquals(0, task.numOfCompsLast7Days)
+        task.add(CompJson(1, Clock.System.now() - Duration.days(2)))
+        assertEquals(1, task.numOfCompsLast7Days)
+    }
+    @Test
+    fun compsLast30Days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0, task.numOfCompsLast30Days)
+        task.add(CompJson(1, Clock.System.now() - Duration.days(2)))
+        assertEquals(1, task.numOfCompsLast30Days)
+        task.add(CompJson(1, Clock.System.now() - Duration.days(31)))
+        assertEquals(1, task.numOfCompsLast30Days)
+    }
+    @Test
+    fun unitsLast7Days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0, task.unitsInLast7Days)
+        task.add(CompJson(30))
+        assertEquals(30, task.unitsInLast7Days)
+        task.add(CompJson(30, Clock.System.now() - Duration.days(9)))
+        assertEquals(30, task.unitsInLast7Days)
+    }
+    @Test
+    fun unitsLast30Days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0, task.unitsInLast30Days)
+        task.add(CompJson(30))
+        task.add(CompJson(50))
+        task.add(CompJson(50, Clock.System.now() - Duration.days(31)))
+        assertEquals(30 + 50, task.unitsInLast30Days)
+    }
+    @Test
+    fun unitsPerWeek() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0, task.unitsPerWeek.size)
+        task.add(CompJson(30))
+        assertEquals(1, task.unitsPerWeek.size)
+        task.add(CompJson(30, Clock.System.now() - Duration.days(7)))
+        assertEquals(2, task.unitsPerWeek.size)
+    }
+    @Test
+    fun stdDevWeek() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        task.add(CompJson(13))
+        task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
+        task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
+        val test = task.unitsPerWeek
+        assertEquals(2f * sqrt(7f / 3f), task.stdDev7days)
     }
 }

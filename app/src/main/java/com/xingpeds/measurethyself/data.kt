@@ -22,6 +22,16 @@ sealed interface Task : MutableCollection<Completion> {
         units: Int = defaultAmount,
         description: Description = Description()
     ): Completion
+    val avgCompPerWeek: Float
+    val avgCompPer30Days: Float
+    val daysSinceCreated: Long
+    val numOfCompsLast7Days: Int
+    val numOfCompsLast30Days: Int
+    val unitsInLast7Days: Int
+    val unitsInLast30Days: Int
+    val stdDev7days: Float
+    val stdDev30days: Float
+    val unitsPerWeek: List<Int>
 
     operator fun get(i: Int): Completion
 }
