@@ -82,6 +82,10 @@ data class TaskJson(
         get() {
             return daysSinceCreated / 7
         }
+    val _30DaysSinceCreate: Long
+        get() {
+            return daysSinceCreated / 30
+        }
     override val numOfCompsLast7Days: Int
         get() = this.compsLast7days.size
 
@@ -109,7 +113,28 @@ data class TaskJson(
             return sqrt(weekDeviations.sum().toFloat() / (weekDeviations.size.toFloat() - 1f))
         }
     override val stdDev30days: Float
-        get() = TODO("Not yet implemented")
+        get() {
+            if (isEmpty() || size == 1) return 0f
+            val months = unitsPer30days
+            val mean = months.sum().toFloat() / months.size.toFloat()
+            val monthDeviations: List<Float> =
+                List<Float>(months.size) {
+                    val dev = months[it] - mean
+                    (dev * dev)
+                }
+            return sqrt(monthDeviations.sum() / (monthDeviations.size.toFloat() - 1f))
+        }
+    override val unitsPer30days: List<Int>
+        get() {
+            if (this.isEmpty()) return emptyList()
+            val _30days = _30DaysSinceCreate
+            val months: MutableList<Int> = MutableList<Int>(_30days.toInt() + 1) { 0 }
+            forEach {
+                val month: Int = (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / 30
+                months[month] += it.units
+            }
+            return months
+        }
     override val unitsPerWeek: List<Int>
         get() {
             if (this.isEmpty()) return emptyList()

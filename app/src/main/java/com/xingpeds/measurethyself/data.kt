@@ -32,6 +32,7 @@ sealed interface Task : MutableCollection<Completion> {
     val stdDev7days: Float
     val stdDev30days: Float
     val unitsPerWeek: List<Int>
+    val unitsPer30days: List<Int>
 
     operator fun get(i: Int): Completion
 }

@@ -195,4 +195,24 @@ internal class TaskJsonTest {
         val test = task.unitsPerWeek
         assertEquals(2f * sqrt(7f / 3f), task.stdDev7days)
     }
+    @Test
+    fun unitsPer30days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        assertEquals(0, task.unitsPer30days.size)
+        task.add(CompJson(30))
+        assertEquals(1, task.unitsPer30days.size)
+        task.add(CompJson(30, Clock.System.now() - Duration.days(7)))
+        assertEquals(1, task.unitsPer30days.size)
+        task.add(CompJson(30, Clock.System.now() - Duration.days(32)))
+        assertEquals(2, task.unitsPer30days.size)
+    }
+    @Test
+    fun stdDev30Days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        task.add(CompJson(13))
+        task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
+        task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
+        val test = task.unitsPerWeek
+        assertEquals(2f * sqrt(7f / 3f), task.stdDev30days)
+    }
 }
