@@ -1,4 +1,4 @@
-package com.xingpeds.measurethyself
+package com.xingpeds.todone
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf

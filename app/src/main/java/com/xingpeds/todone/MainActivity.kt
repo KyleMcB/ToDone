@@ -1,4 +1,4 @@
-package com.xingpeds.measurethyself
+package com.xingpeds.todone
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.xingpeds.measurethyself.ui.theme.MeasurethyselfTheme
+import com.xingpeds.todone.ui.theme.MeasurethyselfTheme
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime

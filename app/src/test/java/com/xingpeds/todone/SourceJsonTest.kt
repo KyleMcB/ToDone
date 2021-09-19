@@ -1,9 +1,8 @@
 package com.xingpeds.todoneproto
 
-import com.xingpeds.measurethyself.Description
-import com.xingpeds.measurethyself.SourceJson
-import com.xingpeds.measurethyself.TaskJson
-import java.util.*
+import com.xingpeds.todone.Description
+import com.xingpeds.todone.SourceJson
+import com.xingpeds.todone.TaskJson
 import kotlin.time.ExperimentalTime
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

@@ -1,4 +1,4 @@
-package com.xingpeds.measurethyself
+package com.xingpeds.todone
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.google.android.material.R
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -61,7 +62,7 @@ class Notifier(val context: Context) {
     val builder =
         NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Missing measurements?")
-            .setSmallIcon(com.xingpeds.measurethyself.R.drawable.ic_baseline_playlist_add_check_24)
+            .setSmallIcon(R.id.icon)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             // Set the intent that will fire when the user taps the notification

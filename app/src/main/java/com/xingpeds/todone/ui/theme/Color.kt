@@ -1,4 +1,4 @@
-package com.xingpeds.measurethyself.ui.theme
+package com.xingpeds.todone.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

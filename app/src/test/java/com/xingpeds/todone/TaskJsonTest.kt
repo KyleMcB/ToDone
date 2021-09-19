@@ -1,8 +1,8 @@
 package com.xingpeds.todoneproto
 
-import com.xingpeds.measurethyself.CompJson
-import com.xingpeds.measurethyself.Description
-import com.xingpeds.measurethyself.TaskJson
+import com.xingpeds.todone.CompJson
+import com.xingpeds.todone.Description
+import com.xingpeds.todone.TaskJson
 import java.util.UUID
 import kotlin.math.sqrt
 import kotlin.time.Duration

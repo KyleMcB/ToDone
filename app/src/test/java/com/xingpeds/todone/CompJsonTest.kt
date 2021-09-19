@@ -1,7 +1,6 @@
 package com.xingpeds.todoneproto
 
-import com.xingpeds.measurethyself.CompJson
-import com.xingpeds.measurethyself.Description
+import com.xingpeds.todone.CompJson
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
@@ -9,7 +8,6 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class CompJsonTest {
@@ -32,5 +30,4 @@ class CompJsonTest {
             }
         )
     }
-
 }

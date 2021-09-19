@@ -1,4 +1,4 @@
-package com.xingpeds.measurethyself
+package com.xingpeds.todone
 
 import androidx.lifecycle.ViewModel
 

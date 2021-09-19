@@ -1,4 +1,4 @@
-package com.xingpeds.measurethyself
+package com.xingpeds.todone
 
 import java.util.*
 import kotlinx.datetime.Instant
