@@ -104,6 +104,7 @@ data class TaskJson(
         get() {
             if (this.isEmpty() || this.size == 1) return 0f
             val weeks = unitsPerWeek
+            if (weeks.size < 2) return 0f
             val mean: Float = weeks.sum().toFloat() / weeks.size.toFloat()
             val weekDeviations: List<Float> =
                 List<Float>(weeks.size) {
@@ -116,6 +117,7 @@ data class TaskJson(
         get() {
             if (isEmpty() || size == 1) return 0f
             val months = unitsPer30days
+            if (months.size < 2) return 0f
             val mean = months.sum().toFloat() / months.size.toFloat()
             val monthDeviations: List<Float> =
                 List<Float>(months.size) {
