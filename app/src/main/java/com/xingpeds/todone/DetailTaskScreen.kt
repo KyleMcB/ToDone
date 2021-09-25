@@ -35,7 +35,7 @@ import kotlinx.datetime.TimeZone
 @ExperimentalMaterialApi
 @Composable
 fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId: UUID) {
-    val temp = dataModel.source.find { task -> task.id == taskId }
+    val temp = dataModel.list.find { task -> task.id == taskId }
     if (temp == null) {
         Log.d("ugh", "how did I get here?")
         //        navController.popBackStack(mainScreenRoute, true)
@@ -95,7 +95,7 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
             Divider()
             DeleteTaskOption(
                 onDelete = {
-                    dataModel.source.remove(task)
+                    dataModel.list.remove(task)
                     dataModel.save()
                     navController.navigate(statsListScreenRoute) {
                         popUpTo(statsListScreenRoute) { inclusive = true }

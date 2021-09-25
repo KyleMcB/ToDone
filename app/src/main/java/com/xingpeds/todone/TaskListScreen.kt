@@ -143,8 +143,7 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
         }
 
         LazyColumn() {
-            items(dataModel.list.value.map { mutableStateOf(it, neverEqualPolicy()) }) { stateTask
-                ->
+            items(dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }) { stateTask ->
                 var detialCompDialog = mutableStateOf(false)
                 TaskQuickComplete(
                     mtask = stateTask,

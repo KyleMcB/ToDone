@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        PersistJsonSource(context = applicationContext).save(model.source)
+        model.save()
     }
 }
 

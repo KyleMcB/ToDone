@@ -27,7 +27,7 @@ fun StatsList(dataModel: DataModel, navController: NavController) {
         Column() {
             //
 
-            dataModel.source.map { mutableStateOf(it, neverEqualPolicy()) }.forEach { stateTask ->
+            dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }.forEach { stateTask ->
                 var detialCompDialog = mutableStateOf(false)
                 // possibly fragile code, can't call Task(task,{},modifier) directly
                 TaskQuickStats(mtask = stateTask, { id -> navController.navigate("/task/$id") })
