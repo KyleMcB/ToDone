@@ -95,7 +95,7 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
             Divider()
             DeleteTaskOption(
                 onDelete = {
-                    dataModel.list.remove(task)
+                    dataModel.deleteTask(task)
                     dataModel.save()
                     navController.navigate(statsListScreenRoute) {
                         popUpTo(statsListScreenRoute) { inclusive = true }

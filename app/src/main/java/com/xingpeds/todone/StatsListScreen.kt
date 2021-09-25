@@ -12,9 +12,11 @@ import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import java.util.*
+import kotlin.time.ExperimentalTime
 
 const val statsListScreenRoute = "statsListScreenRoute"
 
+@ExperimentalTime
 @ExperimentalMaterialApi
 @Composable
 fun StatsList(dataModel: DataModel, navController: NavController) {

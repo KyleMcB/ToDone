@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import kotlin.time.ExperimentalTime
 
 const val mainScreenRoute = "mainScreenRoute"
 
@@ -122,6 +123,7 @@ fun DetailedTaskCompletionDialog(
     }
 }
 
+@ExperimentalTime
 @ExperimentalMaterialApi
 @Composable
 fun TaskListScreen(dataModel: DataModel, navController: NavController) {
@@ -141,20 +143,32 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
         if (openDialog.value) {
             NewTaskDialog(onClose = { openDialog.value = false }, onCreate = dataModel::createTask)
         }
-
-        LazyColumn() {
-            items(dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }) { stateTask ->
-                var detialCompDialog = mutableStateOf(false)
-                TaskQuickComplete(
-                    mtask = stateTask,
-                    {
-                        stateTask.value.createCompletion()
-                        dataModel.save()
-                        stateTask.value = stateTask.value
-                    },
-                    modifier = Modifier.clickable { detialCompDialog.value = true }
-                )
-                ShowCompDialog(mtask = stateTask, show = detialCompDialog)
+        Column() {
+            TabRow(selectedTabIndex = dataModel.selectedTab.ordinal) {
+                dataModel.tabs.forEachIndexed { index, tabName ->
+                    Tab(
+                        selected = index == dataModel.selectedTab.ordinal,
+                        onClick = {
+                            dataModel.onTabSelect(DataModel.SortMethod.valueOf(tabName.uppercase()))
+                        },
+                        text = { Text(tabName) }
+                    )
+                }
+            }
+            LazyColumn() {
+                items(dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }) { stateTask ->
+                    var detialCompDialog = mutableStateOf(false)
+                    TaskQuickComplete(
+                        mtask = stateTask,
+                        {
+                            stateTask.value.createCompletion()
+                            dataModel.save()
+                            dataModel.reComposeList()
+                        },
+                        modifier = Modifier.clickable { detialCompDialog.value = true }
+                    )
+                    ShowCompDialog(mtask = stateTask, show = detialCompDialog)
+                }
             }
         }
     }
