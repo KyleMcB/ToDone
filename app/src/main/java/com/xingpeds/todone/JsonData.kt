@@ -191,7 +191,6 @@ data class TaskJson(
 @OptIn(kotlin.time.ExperimentalTime::class)
 @Serializable
 class SourceJson : Source {
-    // not going to serialize properly...
     private val tasks: MutableSet<TaskJson> = mutableSetOf<TaskJson>()
     override val size
         get() = tasks.size
@@ -218,18 +217,20 @@ class SourceJson : Source {
 
     override fun add(element: Task): Boolean {
 
-        return if (element is TaskJson) {
+        return if (contains(element)) false // not tested :(
+        else if (element is TaskJson) {
             tasks.add(element)
             true
         } else {
             tasks.add(
                 TaskJson(
-                    element.name,
-                    element.desc,
-                    element.unit,
-                    element.defaultAmount,
-                    element.id
-                )
+                        element.name,
+                        element.desc,
+                        element.unit,
+                        element.defaultAmount,
+                        element.id
+                    )
+                    .apply { addAll(element) } // not tested :(
             )
             true
         }
