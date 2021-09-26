@@ -76,6 +76,7 @@ private fun String?.toUUID(): UUID {
 fun TaskListItem(
     task: Task,
     TrailingButton: @Composable () -> Unit,
+    secondary: @Composable () -> Unit = { LastCompDescription(task = task) },
     modifier: Modifier = Modifier
 ) {
 
@@ -84,12 +85,12 @@ fun TaskListItem(
         text = { Text(text = task.name) },
         overlineText = { if (task.lastOrNull() != null) PreviousCompTime(comp = task.last()) },
         trailing = { TrailingButton() },
-        secondaryText = { LastCompDescription(task = task) }
+        secondaryText = secondary
     )
 }
 
 @Composable
-fun LastCompDescription(task: Task) {
+public fun LastCompDescription(task: Task) {
     val comps = task.filterNotNull()
     if (comps.isNotEmpty() && comps.last().desc.text != null) {
         Text("Last ->" + comps.last().desc.text!!)

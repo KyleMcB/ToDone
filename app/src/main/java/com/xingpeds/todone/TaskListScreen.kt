@@ -165,7 +165,8 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
                             dataModel.save()
                             dataModel.reComposeList()
                         },
-                        modifier = Modifier.clickable { detialCompDialog.value = true }
+                        modifier = Modifier.clickable { detialCompDialog.value = true },
+                        dataModel.selectedTab
                     )
                     ShowCompDialog(mtask = stateTask, show = detialCompDialog)
                 }
@@ -179,10 +180,24 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
 fun TaskQuickComplete(
     mtask: MutableState<Task>,
     onCreateCompletion: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sortMethod: DataModel.SortMethod
 ) {
     val task = mtask.value
 
+    val seconday =
+        when (sortMethod) {
+            DataModel.SortMethod.RATE -> {
+                if (task.stdDev7days == 0f) {
+                    "not enough data to calculate rates"
+                } else {
+                    task.stdDev7days.toString()
+                }
+            }
+            DataModel.SortMethod.TIME -> task.lastOrNull()?.desc?.text ?: "no description"
+            DataModel.SortMethod.UNITS ->
+                "${task.unitsInLast7Days}: units recorded in the last 7 days"
+        }
     TaskListItem(
         task,
         {
@@ -193,6 +208,7 @@ fun TaskQuickComplete(
                 }
             ) { Icon(imageVector = Icons.Default.Done, contentDescription = "create Completion") }
         },
-        modifier
+        modifier = modifier,
+        secondary = { Text(seconday) }
     )
 }

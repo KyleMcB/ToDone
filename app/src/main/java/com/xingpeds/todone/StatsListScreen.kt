@@ -58,6 +58,6 @@ fun TaskQuickStats(
                 )
             }
         },
-        modifier.clickable { goToDetails(task.id) }
+        modifier = modifier.clickable { goToDetails(task.id) }
     )
 }
