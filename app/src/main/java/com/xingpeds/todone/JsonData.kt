@@ -140,7 +140,6 @@ data class TaskJson(
     override val unitsPerWeek: List<Int>
         get() {
             if (this.isEmpty()) return emptyList()
-            val days = daysSinceCreated
             val weeks: MutableList<Int> = MutableList<Int>(weeksSinceCreated.toInt() + 1) { 0 }
             forEach {
                 val week: Int = (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / 7
@@ -188,7 +187,7 @@ data class TaskJson(
     override fun retainAll(elements: Collection<Completion>) = comps.retainAll(elements)
 }
 
-@OptIn(kotlin.time.ExperimentalTime::class)
+@ExperimentalTime
 @Serializable
 class SourceJson : Source {
     private val tasks: MutableSet<TaskJson> = mutableSetOf<TaskJson>()
