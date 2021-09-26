@@ -3,7 +3,6 @@ package com.xingpeds.todone
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
-import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import java.util.*
@@ -11,6 +10,7 @@ import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 
+@ExperimentalTime
 class DataModel(application: Application) : AndroidViewModel(application) {
     private val _sourcej: SourceJson = PersistJsonSource(application).load()
     private val _source: Source =
@@ -49,7 +49,7 @@ class DataModel(application: Application) : AndroidViewModel(application) {
     }
     val tabs =
         SortMethod.values().toList().map { tab ->
-            tab.name.lowercase().capitalize(locale = Locale.ENGLISH)
+            tab.name.lowercase().replaceFirstChar { char -> char.uppercase() }
         }
 
     fun onTabSelect(sortMethod: SortMethod) {
