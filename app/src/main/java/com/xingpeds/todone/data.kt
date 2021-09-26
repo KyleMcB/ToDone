@@ -33,7 +33,7 @@ sealed interface Task : MutableCollection<Completion> {
     val stdDev30days: Float
     val unitsPerWeek: List<Int>
     val unitsPer30days: List<Int>
-
+    abstract override fun hashCode(): Int
     operator fun get(i: Int): Completion
 }
 
