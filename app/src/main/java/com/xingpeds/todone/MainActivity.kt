@@ -3,6 +3,7 @@ package com.xingpeds.todone
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -22,10 +23,22 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.periodUntil
 
+@ExperimentalTime
 class MainActivity : ComponentActivity() {
     private val model: DataModel by viewModels<DataModel>()
+    private val exporter =
+        registerForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
+            contentResolver.openOutputStream(uri)?.use { model.onExport(it) }
+        }
+    private val importer =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            contentResolver.openInputStream(uri)?.use {
+                model.onImport(it, this)
 
-    @ExperimentalTime
+                model.reComposeList()
+            }
+        }
+
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +56,17 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             MeasurethyselfTheme {
                 NavHost(navController = navController, startDestination = mainScreenRoute) {
-                    composable(mainScreenRoute) { TaskListScreen(model, navController) }
+                    composable(mainScreenRoute) {
+                        Column() {
+                            Button(onClick = { exporter.launch("data.json") }) {
+                                Text(text = "export")
+                            }
+                            Button(onClick = { importer.launch(arrayOf("application/json")) }) {
+                                Text("import")
+                            }
+                            TaskListScreen(model, navController)
+                        }
+                    }
                     composable(statsListScreenRoute) {
                         StatsList(dataModel = model, navController = navController)
                     }

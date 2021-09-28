@@ -1,10 +1,13 @@
 package com.xingpeds.todone
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.launch
@@ -12,9 +15,9 @@ import kotlinx.datetime.Instant
 
 @ExperimentalTime
 class DataModel(application: Application) : AndroidViewModel(application) {
-    private val _sourcej: SourceJson = PersistJsonSource(application).load()
-    private val _source: Source =
-        _sourcej // force it to use the interface so copies can not be made
+    private var _sourcej: SourceJson = PersistJsonSource(application).load()
+    private val _source: Source
+        get() = _sourcej // force it to use the interface so copies can not be made
     private val _list = mutableStateOf(_source, neverEqualPolicy())
     private val _selectedTab = mutableStateOf(SortMethod.RATE)
     val selectedTab
@@ -30,6 +33,15 @@ class DataModel(application: Application) : AndroidViewModel(application) {
         save()
         reComposeList()
     }
+    fun onImport(stream: InputStream, context: Context) =
+        import(context, stream).also {
+            _sourcej = PersistJsonSource(context).load()
+            _list.value = _source
+        }
+    fun onExport(stream: OutputStream) {
+        export(stream, _source)
+    }
+
     fun reComposeList() {
         _list.value = _list.value
     }
@@ -56,6 +68,7 @@ class DataModel(application: Application) : AndroidViewModel(application) {
         _selectedTab.value = sortMethod
         reComposeList()
     }
+
     @ExperimentalTime
     class TaskSorter(val sortMethod: SortMethod) : Comparator<Task> {
         override fun compare(p0: Task?, p1: Task?): Int {
