@@ -175,6 +175,7 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
     }
 }
 
+@ExperimentalTime
 @ExperimentalMaterialApi
 @Composable
 fun TaskQuickComplete(
@@ -196,7 +197,7 @@ fun TaskQuickComplete(
             }
             DataModel.SortMethod.TIME -> task.lastOrNull()?.desc?.text ?: "no description"
             DataModel.SortMethod.UNITS ->
-                "${task.unitsInLast7Days}: units recorded in the last 7 days"
+                "${task.unitsInLast7Days}: ${task.unit} recorded in the last 7 days"
         }
     TaskListItem(
         task,

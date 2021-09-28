@@ -85,7 +85,11 @@ class DataModel(application: Application) : AndroidViewModel(application) {
                     return ((p0.stdDev7days - p0.unitsInLast7Days) -
                             (p1.stdDev7days - p1.unitsInLast7Days))
                         .toInt()
-                SortMethod.UNITS -> return ((p0.unitsInLast7Days) - (p1.unitsInLast7Days))
+                SortMethod.UNITS -> {
+                    return ((p0.unitsInLast7Days) - (p1.unitsInLast7Days)) +
+                        if (p0.unit.lowercase() > p1.unit.lowercase()) Int.MIN_VALUE
+                        else Int.MAX_VALUE
+                }
                 SortMethod.TIME -> {
                     val a = p0.lastOrNull()?.timeStamp ?: Instant.DISTANT_PAST
                     val b = p1.lastOrNull()?.timeStamp ?: Instant.DISTANT_PAST
