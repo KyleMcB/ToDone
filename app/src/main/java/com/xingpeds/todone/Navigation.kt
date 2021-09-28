@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
@@ -45,4 +46,11 @@ fun ColumnScope.DrawerContent(navController: NavController) {
                 navController.navigate(statsListScreenRoute) { popUpTo(mainScreenRoute) }
             }
     ) { Text("Stats") }
+    ListItem(
+        icon = { Icon(Icons.Default.AccountBox, "storage settings") },
+        modifier =
+            Modifier.clickable {
+                navController.navigate(storageScreenRoute) { popUpTo(mainScreenRoute) }
+            }
+    ) { Text("Data location") }
 }

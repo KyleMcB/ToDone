@@ -30,6 +30,18 @@ fun export(file: OutputStream, source: Source) {
 @ExperimentalTime
 fun import(context: Context, file: InputStream) {
     val persistJsonSource = PersistJsonSource(context)
+    val source = _import(file)
+    persistJsonSource.save(source)
+}
+
+@ExperimentalTime
+fun _import(file: InputStream): SourceJson {
+    val stringData = readStream(file)
+    val source = Json.decodeFromString<SourceJson>(stringData)
+    return source
+}
+
+private fun readStream(file: InputStream): String {
     val stringBuilder = StringBuilder()
     BufferedReader(InputStreamReader(file)).use { reader ->
         var line: String? = reader.readLine()
@@ -38,6 +50,6 @@ fun import(context: Context, file: InputStream) {
             line = reader.readLine()
         }
     }
-    val source = Json.decodeFromString<SourceJson>(stringBuilder.toString())
-    persistJsonSource.save(source)
+
+    return stringBuilder.toString()
 }

@@ -28,15 +28,16 @@ class MainActivity : ComponentActivity() {
     private val model: DataModel by viewModels<DataModel>()
     private val exporter =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
-            contentResolver.openOutputStream(uri)?.use { model.onExport(it) }
+            if (uri != null) contentResolver.openOutputStream(uri)?.use { model.onExport(it) }
         }
     private val importer =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            contentResolver.openInputStream(uri)?.use {
-                model.onImport(it, this)
+            if (uri != null)
+                contentResolver.openInputStream(uri)?.use {
+                    model.onImport(it, this)
 
-                model.reComposeList()
-            }
+                    model.reComposeList()
+                }
         }
 
     @ExperimentalMaterialApi
@@ -56,17 +57,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             MeasurethyselfTheme {
                 NavHost(navController = navController, startDestination = mainScreenRoute) {
-                    composable(mainScreenRoute) {
-                        Column() {
-                            Button(onClick = { exporter.launch("data.json") }) {
-                                Text(text = "export")
-                            }
-                            Button(onClick = { importer.launch(arrayOf("application/json")) }) {
-                                Text("import")
-                            }
-                            TaskListScreen(model, navController)
-                        }
-                    }
+                    composable(mainScreenRoute) { TaskListScreen(model, navController) }
                     composable(statsListScreenRoute) {
                         StatsList(dataModel = model, navController = navController)
                     }
@@ -75,6 +66,15 @@ class MainActivity : ComponentActivity() {
                             dataModel = model,
                             navController = navController,
                             it.arguments?.getString("taskId").toUUID()
+                        )
+                    }
+
+                    composable(storageScreenRoute) {
+                        StorageScreen(
+                            dataModel = model,
+                            navController = navController,
+                            onImport = { importer.launch(arrayOf("application/json")) },
+                            onExport = { exporter.launch("data.json") }
                         )
                     }
                 }
