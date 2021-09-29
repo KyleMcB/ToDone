@@ -68,6 +68,11 @@ data class TaskJson(
             val numOf30Days = this.daysSinceCreated / 30f
             return this.size / numOf30Days
         }
+    override val avgUnitPerWeek: Float
+        get() = unitsPerWeek.sum().toFloat() / unitsPerWeek.size.apply { if (this == 0) return 1f }
+    override val avgUnitPer30Days: Float
+        get() =
+            unitsPer30days.sum().toFloat() / unitsPer30days.size.apply { if (this == 0) return 1f }
     val compsLast7days: List<Completion>
         get() =
             this.filter {

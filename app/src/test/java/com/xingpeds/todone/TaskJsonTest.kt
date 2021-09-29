@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Test
 
-@OptIn(kotlin.time.ExperimentalTime::class)
+@ExperimentalTime
 internal class TaskJsonTest {
 
     val taskNoComps: TaskJson =
@@ -111,7 +111,7 @@ internal class TaskJsonTest {
 
     @Test
     fun createQuickCompletion() {
-        val comp = taskNoComps.createCompletion()
+        taskNoComps.createCompletion()
         assert(taskNoComps.size == 1)
     }
     @Test
@@ -192,7 +192,6 @@ internal class TaskJsonTest {
         task.add(CompJson(13))
         task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
-        val test = task.unitsPerWeek
         assertEquals(2f * sqrt(7f / 3f), task.stdDev7days)
     }
     @Test
@@ -212,7 +211,22 @@ internal class TaskJsonTest {
         task.add(CompJson(13))
         task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
-        val test = task.unitsPerWeek
         assertEquals(2f * sqrt(7f / 3f), task.stdDev30days)
+    }
+    @Test
+    fun avgUnitPerWeek() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        task.add(CompJson(13))
+        task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
+        task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
+        assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPerWeek)
+    }
+    @Test
+    fun avgUnits30Days() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        task.add(CompJson(13))
+        task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
+        task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
+        assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPer30Days)
     }
 }

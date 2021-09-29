@@ -24,6 +24,8 @@ sealed interface Task : MutableCollection<Completion> {
     ): Completion
     val avgCompPerWeek: Float
     val avgCompPer30Days: Float
+    val avgUnitPerWeek: Float
+    val avgUnitPer30Days: Float
     val daysSinceCreated: Long
     val numOfCompsLast7Days: Int
     val numOfCompsLast30Days: Int

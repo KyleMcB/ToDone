@@ -55,6 +55,7 @@ class AbsentNotifyWorker(val context: Context, workerParams: WorkerParameters) :
     }
 }
 
+@ExperimentalTime
 class Notifier(val context: Context) {
     val CHANNEL_ID = "AN ID"
     val myintent = Intent(context, MainActivity::class.java)

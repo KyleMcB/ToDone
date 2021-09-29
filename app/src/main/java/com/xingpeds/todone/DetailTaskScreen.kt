@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -20,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import java.util.*
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
@@ -51,6 +52,8 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
     ) {
         val taskName = remember { mutableStateOf(task.name) }
         val taskDescText = remember { mutableStateOf(task.desc.text ?: "") }
+        val taskUnits = remember { mutableStateOf(task.unit) }
+        val taskDefaultUnits = remember { mutableStateOf(task.defaultAmount) }
         Column {
             DetailTaskScreenTaskName(
                 taskName.value,
@@ -60,7 +63,8 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
                     dataModel.save()
                 }
             )
-
+            // TODO allow edit of units and default unit amount
+            // TODO add stats
             Divider(modifier = Modifier.padding(10.dp))
             DetailTaskScreenDescription(
                 taskDescText.value,
@@ -70,17 +74,30 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
                     dataModel.save()
                 }
             )
+            Divider(modifier = Modifier.padding(10.dp))
+            DetailTaskScreenUnits(
+                taskUnits.value,
+                onChange = { text: String ->
+                    taskUnits.value = text
+                    task.unit = text
+                    dataModel.save()
+                }
+            )
 
             Divider(modifier = Modifier.padding(10.dp))
-            Text("a bunch of stats here")
-            val lastWeekCount =
-                task
-                    .filter { comp ->
-                        comp.timeStamp in
-                            (Clock.System.now() - Duration.days(7)..Clock.System.now())
-                    }
-                    .count()
-            Text("$lastWeekCount done in last week")
+            DetailTaskScreenDefaultAmount(
+                taskDefaultUnits.value,
+                onChange = { amount: Int ->
+                    taskDefaultUnits.value = amount
+                    task.defaultAmount = amount
+                    dataModel.save()
+                }
+            )
+
+            Divider(modifier = Modifier.padding(10.dp))
+            Text("completed ${task.numOfCompsLast7Days} times in last 7 days")
+            Text("total of ${task.unitsInLast7Days} ${task.unit} in last 7 days")
+            Text("weekly standard deviation ${task.stdDev7days}")
             Divider(modifier = Modifier.padding(10.dp))
             Text("Completions")
             LazyColumn(
@@ -102,6 +119,73 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
                     }
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun DetailTaskScreenDefaultAmount(value: Int, onChange: (Int) -> Unit) {
+    var editing: Boolean by remember { mutableStateOf(false) }
+    var valid: Boolean by remember { mutableStateOf(true) }
+    Row() {
+        if (editing) {
+            TextField(
+                value = value.toString(),
+                onValueChange = {
+                    try {
+                        if (it.isBlank()) onChange(0) else onChange(it.toInt())
+                        valid = true
+                    } catch (e: Throwable) {
+                        valid = false
+                    }
+                },
+                placeholder = { Text("Default amount for quick complete") },
+                keyboardActions = KeyboardActions(onDone = { editing = false }),
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = !valid
+            )
+            IconButton(onClick = { editing = false }) {
+                Icon(Icons.Default.Done, "finished editing")
+            }
+        } else {
+            Text(
+                text = value.toString(),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = { editing = true }) { Icon(Icons.Default.Edit, "edit") }
+        }
+    }
+}
+
+@Composable
+fun DetailTaskScreenUnits(name: String, onChange: (String) -> Unit) {
+    var editing: Boolean by remember { mutableStateOf(false) }
+
+    Row() {
+        if (editing) {
+            TextField(
+                value = name,
+                onValueChange = onChange,
+                placeholder = { Text("Miles, Minutes, Calories, etc....") },
+                keyboardActions = KeyboardActions(onDone = { editing = false }),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = { editing = false }) {
+                Icon(Icons.Default.Done, "finished editing")
+            }
+        } else {
+            Text(
+                text = name,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = { editing = true }) { Icon(Icons.Default.Edit, "edit") }
         }
     }
 }
