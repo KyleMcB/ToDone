@@ -6,13 +6,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class Description(var text: String? = null, var picture: String? = null)
 
-sealed interface Completion {
+sealed interface Completion : Comparable<Completion> {
     val units: Int
     val timeStamp: Instant
+    override fun compareTo(other: Completion): Int {
+        return timeStamp.compareTo(other.timeStamp)
+    }
+
     val desc: Description
 }
 
-sealed interface Task : MutableCollection<Completion> {
+sealed interface Task : MutableSet<Completion> {
     var name: String
     val desc: Description
     var unit: String
@@ -36,7 +40,6 @@ sealed interface Task : MutableCollection<Completion> {
     val unitsPerWeek: List<Int>
     val unitsPer30days: List<Int>
     abstract override fun hashCode(): Int
-    operator fun get(i: Int): Completion
 }
 
 sealed interface Source : MutableSet<Task> {

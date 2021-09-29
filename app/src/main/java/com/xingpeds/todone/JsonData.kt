@@ -47,7 +47,7 @@ data class TaskJson(
 ) : Task {
 
     // this probably isn't going to serialize properly. need to do private constructor trick
-    private val comps: MutableList<CompJson> = mutableListOf()
+    private val comps: MutableSet<CompJson> = mutableSetOf()
     override fun createCompletion(units: Int, description: Description): Completion {
         val comp = CompJson(units, desc = description)
         comps.add(comp)
@@ -152,10 +152,6 @@ data class TaskJson(
             }
             return weeks.toList()
         }
-
-    override fun get(i: Int): Completion {
-        return comps.get(i)
-    }
 
     override fun hashCode(): Int {
         return id.hashCode()
