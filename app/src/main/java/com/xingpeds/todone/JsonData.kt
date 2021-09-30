@@ -188,6 +188,16 @@ data class TaskJson(
     override fun retainAll(elements: Collection<Completion>) = comps.retainAll(elements)
 }
 
+fun Completion.toCompJson(): CompJson {
+    return CompJson(units, timeStamp, desc)
+}
+
+@ExperimentalTime
+fun Task.toTaskJson(): TaskJson {
+    val other = this
+    return TaskJson(name, desc, unit, defaultAmount, id).apply { addAll(other) }
+}
+
 @ExperimentalTime
 @Serializable
 class SourceJson : Source {

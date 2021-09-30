@@ -3,6 +3,10 @@ package com.xingpeds.todoneproto
 import com.xingpeds.todone.CompJson
 import com.xingpeds.todone.Description
 import com.xingpeds.todone.TaskJson
+import com.xingpeds.todone.rate.Accelerating
+import com.xingpeds.todone.rate.Declining
+import com.xingpeds.todone.rate.Maintaining
+import com.xingpeds.todone.rate.rateLast7days
 import java.util.UUID
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -228,5 +232,39 @@ internal class TaskJsonTest {
         task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
         assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPer30Days)
+    }
+    @Test
+    fun rate7DayOfDecline() {
+        // test of decline
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        with(task) {
+            add(CompJson(100, Clock.System.now() - Duration.days(8)))
+            add(CompJson(120, Clock.System.now() - Duration.days(15)))
+            add(CompJson(80, Clock.System.now() - Duration.days(22)))
+            add(CompJson(50))
+        }
+        assert(task.rateLast7days() is Declining)
+    }
+    @Test
+    fun rate7DayOfMaintain() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        with(task) {
+            add(CompJson(100, Clock.System.now() - Duration.days(8)))
+            add(CompJson(120, Clock.System.now() - Duration.days(15)))
+            add(CompJson(80, Clock.System.now() - Duration.days(22)))
+            add(CompJson(100))
+        }
+        assert(task.rateLast7days() is Maintaining)
+    }
+    @Test
+    fun rate7DaysOfAccel() {
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        with(task) {
+            add(CompJson(100, Clock.System.now() - Duration.days(8)))
+            add(CompJson(120, Clock.System.now() - Duration.days(15)))
+            add(CompJson(80, Clock.System.now() - Duration.days(22)))
+            add(CompJson(130))
+        }
+        assert(task.rateLast7days() is Accelerating)
     }
 }
