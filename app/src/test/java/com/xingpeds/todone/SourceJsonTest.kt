@@ -64,10 +64,4 @@ internal class SourceJsonTest {
         sourceTwoTasks.add(slightlyDiff)
         assert(sourceTwoTasks.size == 2)
     }
-
-    @Test fun addAll() {}
-
-    @Test fun clear() {}
-
-    @Test fun remove() {}
 }
