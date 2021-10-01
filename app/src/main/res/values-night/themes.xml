@@ -1,3 +1,8 @@
+<!--
+  ~ Copyright (c) 2021. Kyle McBurnett
+  ~ All rights reserved
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Measurethyself" parent="Theme.MaterialComponents.DayNight.DarkActionBar">

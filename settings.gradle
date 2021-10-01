@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {

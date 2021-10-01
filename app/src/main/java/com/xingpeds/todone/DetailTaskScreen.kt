@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 package com.xingpeds.todone
 
 import android.util.Log
@@ -27,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.xingpeds.todone.rate.maintianRange
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
@@ -63,7 +69,7 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
                     dataModel.save()
                 }
             )
-            // TODO allow edit of units and default unit amount
+
             // TODO add stats
             Divider(modifier = Modifier.padding(10.dp))
             DetailTaskScreenDescription(
@@ -98,6 +104,7 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
             Text("completed ${task.numOfCompsLast7Days} times in last 7 days")
             Text("total of ${task.unitsInLast7Days} ${task.unit} in last 7 days")
             Text("weekly standard deviation ${task.stdDev7days}")
+            Text("maintanence range ${task.maintianRange}")
             Divider(modifier = Modifier.padding(10.dp))
             Text("Completions")
             LazyColumn(

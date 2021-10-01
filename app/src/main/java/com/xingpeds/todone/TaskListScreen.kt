@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 package com.xingpeds.todone
 
 import androidx.compose.foundation.background
@@ -22,6 +27,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.xingpeds.todone.rate.Accelerating
+import com.xingpeds.todone.rate.Declining
+import com.xingpeds.todone.rate.Maintaining
+import com.xingpeds.todone.rate.rateLast7days
 import kotlin.time.ExperimentalTime
 
 const val mainScreenRoute = "mainScreenRoute"
@@ -189,10 +198,10 @@ fun TaskQuickComplete(
     val seconday =
         when (sortMethod) {
             DataModel.SortMethod.RATE -> {
-                if (task.stdDev7days == 0f) {
-                    "not enough data to calculate rates"
-                } else {
-                    task.stdDev7days.toString()
+                when (task.rateLast7days()) {
+                    is Accelerating -> "Accelerating"
+                    is Declining -> "Declining"
+                    is Maintaining -> "Maintaining"
                 }
             }
             DataModel.SortMethod.TIME -> task.lastOrNull()?.desc?.text ?: "no description"

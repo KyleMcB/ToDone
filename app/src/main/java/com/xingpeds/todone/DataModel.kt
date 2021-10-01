@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 package com.xingpeds.todone
 
 import android.app.Application
@@ -6,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.xingpeds.todone.rate.rateLast7days
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
@@ -24,7 +30,23 @@ class DataModel(application: Application) : AndroidViewModel(application) {
         get() = _selectedTab.value
     @ExperimentalTime
     val list: List<Task>
-        get() = _list.value.sortedWith(TaskSorter(selectedTab))
+        get() =
+            when (selectedTab) {
+                SortMethod.RATE -> {
+                    _list.value.groupBy { it.rateLast7days() }.flatMap { it.value }
+                }
+                SortMethod.UNITS -> {
+
+                    _list.value.toList().groupBy { it.unit }.flatMap { entry ->
+                        entry.value.sortedBy { it.unitsInLast7Days }
+                    }
+                }
+                SortMethod.TIME -> {
+                    _list.value.toList().sortedBy { it.lastOrNull()?.timeStamp }
+                }
+            }
+
+    //            _list.value.sortedWith(TaskSorter(selectedTab))
 
     fun createTask(name: String, description: String, unit: String, defaultAmount: Int) {
         val descString: String? = if (description.isBlank()) null else description

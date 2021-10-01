@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'

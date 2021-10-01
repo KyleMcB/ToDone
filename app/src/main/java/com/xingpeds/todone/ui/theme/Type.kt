@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 package com.xingpeds.todone.ui.theme
 
 import androidx.compose.material.Typography

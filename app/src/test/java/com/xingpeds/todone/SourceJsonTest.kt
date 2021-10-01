@@ -1,9 +1,17 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 package com.xingpeds.todoneproto
 
+import com.xingpeds.todone.CompJson
 import com.xingpeds.todone.Description
 import com.xingpeds.todone.SourceJson
 import com.xingpeds.todone.TaskJson
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -63,5 +71,39 @@ internal class SourceJsonTest {
         val slightlyDiff = task1.apply { name = "a new name" }
         sourceTwoTasks.add(slightlyDiff)
         assert(sourceTwoTasks.size == 2)
+    }
+    @Test
+    fun makeFakeData() {
+        val source = SourceJson()
+        val task1 =
+            TaskJson(
+                    "Exercise",
+                    Description("At lest 20 minutes of heart pounding workout"),
+                    "Minutes",
+                    20
+                )
+                .apply {
+                    add(
+                        CompJson(
+                            9,
+                            Clock.System.now() - Duration.days(1),
+                            Description("ride to work")
+                        )
+                    )
+                }
+        val task2 =
+            TaskJson(
+                "Diet",
+                Description("a meal with a good amount of fiber and protein"),
+                "Meals",
+                1
+            )
+        val task3 =
+            TaskJson(
+                "Bicycle ride",
+                Description("use my E-Bike to get somewhere instead of car"),
+                "Miles",
+                9
+            )
     }
 }

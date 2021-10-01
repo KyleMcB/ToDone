@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Kyle McBurnett
+ * All rights reserved
+ */
+
 package com.xingpeds.todone.rate
 
 import com.xingpeds.todone.Task
@@ -22,5 +27,12 @@ fun rate7DayOf(task: Task): TaskRate {
         else -> Maintaining()
     }
 }
+
+val Task.maintianRange: ClosedFloatingPointRange<Float>
+    get() {
+        val lowerMaintBound = avgUnitPerWeek.absoluteValue - stdDev7days.absoluteValue
+        val upperMaintBound = avgUnitPerWeek.absoluteValue + stdDev7days.absoluteValue
+        return lowerMaintBound..upperMaintBound
+    }
 
 fun Task.rateLast7days() = rate7DayOf(this)
