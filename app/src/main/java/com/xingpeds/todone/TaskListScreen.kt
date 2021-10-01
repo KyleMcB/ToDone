@@ -27,10 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.xingpeds.todone.rate.Accelerating
-import com.xingpeds.todone.rate.Declining
-import com.xingpeds.todone.rate.Maintaining
-import com.xingpeds.todone.rate.rateLast7days
+import com.xingpeds.todone.rate.*
 import kotlin.time.ExperimentalTime
 
 const val mainScreenRoute = "mainScreenRoute"
@@ -197,13 +194,7 @@ fun TaskQuickComplete(
 
     val seconday =
         when (sortMethod) {
-            DataModel.SortMethod.RATE -> {
-                when (task.rateLast7days()) {
-                    is Accelerating -> "Accelerating"
-                    is Declining -> "Declining"
-                    is Maintaining -> "Maintaining"
-                }
-            }
+            DataModel.SortMethod.RATE -> task.rateLast7days().toString()
             DataModel.SortMethod.TIME -> task.lastOrNull()?.desc?.text ?: "no description"
             DataModel.SortMethod.UNITS ->
                 "${task.unitsInLast7Days}: ${task.unit} recorded in the last 7 days"
