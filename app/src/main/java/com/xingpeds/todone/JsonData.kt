@@ -85,6 +85,7 @@ data class TaskJson(
             }
     override val daysSinceCreated: Long
         get() {
+            if (isEmpty()) return 0
             val list = this.sortedBy { it.timeStamp }
             return (Clock.System.now() - list.first().timeStamp).inWholeDays
         }

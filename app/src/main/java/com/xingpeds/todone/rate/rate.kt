@@ -8,27 +8,35 @@ package com.xingpeds.todone.rate
 import com.xingpeds.todone.Task
 import kotlin.math.absoluteValue
 
-sealed class TaskRate {
+sealed class TaskRate7Day {
     abstract override fun toString(): String
 }
 
-class Accelerating : TaskRate() {
+class Accelerating : TaskRate7Day() {
     override fun toString() = "Accelerating"
 }
 
-class Maintaining : TaskRate() {
+class Maintaining : TaskRate7Day() {
     override fun toString() = "Maintaining"
 }
 
-class Declining : TaskRate() {
+class Declining : TaskRate7Day() {
     override fun toString() = "Declining"
 }
 
-class Volatile : TaskRate() {
+class Volatile : TaskRate7Day() {
     override fun toString() = "Data is too volatile"
 }
 
-fun rate7DayOf(task: Task): TaskRate {
+class Immature(val days: Int = -1) : TaskRate7Day() {
+    override fun toString(): String {
+        if (days > -1) return "need $days more days of data to calculate rate"
+        return "need at least 2 weeks of data to calculate rate"
+    }
+}
+
+fun rate7DayOf(task: Task): TaskRate7Day {
+    if (task.daysSinceCreated < 14) return Immature(14 - task.daysSinceCreated.toInt())
     if (task.stdDev7days > task.avgUnitPerWeek) return Volatile()
     val lowerMaintBound = task.avgUnitPerWeek.absoluteValue - task.stdDev7days.absoluteValue
     val upperMaintBound = task.avgUnitPerWeek.absoluteValue + task.stdDev7days.absoluteValue
