@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.xingpeds.todone.ui.theme.MeasurethyselfTheme
+import com.xingpeds.todone.ui.theme.ToDoneTheme
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            MeasurethyselfTheme {
+            ToDoneTheme {
                 NavHost(navController = navController, startDestination = mainScreenRoute) {
                     composable(mainScreenRoute) { TaskListScreen(model, navController) }
                     composable(statsListScreenRoute) {

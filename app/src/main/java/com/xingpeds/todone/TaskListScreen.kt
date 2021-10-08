@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -22,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -209,7 +211,10 @@ fun TaskQuickComplete(
                 onClick = {
                     onCreateCompletion()
                     mtask.value = task
-                }
+                },
+                modifier =
+                    Modifier.shadow(elevation = 14.dp, shape = CircleShape)
+                        .background(color = MaterialTheme.colors.secondary, shape = CircleShape),
             ) { Icon(imageVector = Icons.Default.Done, contentDescription = "create Completion") }
         },
         modifier = modifier,

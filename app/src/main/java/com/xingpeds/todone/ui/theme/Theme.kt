@@ -31,10 +31,7 @@ private val LightColorPalette =
         )
 
 @Composable
-fun MeasurethyselfTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
-) {
+fun ToDoneTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
     val colors =
         if (darkTheme) {
             DarkColorPalette
