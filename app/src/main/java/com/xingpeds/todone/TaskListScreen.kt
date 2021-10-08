@@ -22,7 +22,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -44,7 +43,7 @@ fun NewTaskDialog(
         var amount: Int by remember { mutableStateOf(0) }
         Column(
             Modifier.clip(RoundedCornerShape(5))
-                .background(Color.White)
+                .background(MaterialTheme.colors.background)
                 .padding(5.dp)
                 .wrapContentSize()
         ) {
@@ -106,7 +105,11 @@ fun DetailedTaskCompletionDialog(
     Dialog(onDismissRequest = onDismiss) {
         var units: Int by remember { mutableStateOf(defaultAmount) }
         var description: String by remember { mutableStateOf("") }
-        Column(modifier = Modifier.wrapContentSize(Alignment.Center).background(Color.White)) {
+        Column(
+            modifier =
+                Modifier.wrapContentSize(Alignment.Center)
+                    .background(MaterialTheme.colors.background)
+        ) {
             OutlinedTextField(
                 value = units.toString(),
                 onValueChange = { units = it.toIntOrNull() ?: 0 },
