@@ -17,12 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.xingpeds.todone.ui.theme.MeasurethyselfTheme
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -48,15 +44,6 @@ class MainActivity : ComponentActivity() {
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val notifyWorkRequest =
-            PeriodicWorkRequestBuilder<AbsentNotifyWorker>(8, TimeUnit.HOURS, 1, TimeUnit.HOURS)
-                .build()
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                AbsentNotifyWorker.workName,
-                ExistingPeriodicWorkPolicy.REPLACE,
-                notifyWorkRequest
-            )
 
         setContent {
             val navController = rememberNavController()

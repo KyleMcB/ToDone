@@ -29,14 +29,7 @@ class AbsentNotifyWorker(val context: Context, workerParams: WorkerParameters) :
     companion object {
         val workName: String = "myName"
     }
-    val workName = "absentWork"
-    val mostRecentComp
-        get() =
-            PersistJsonSource(context)
-                .load()
-                .flatten()
-                .sortedByDescending { comp -> comp.timeStamp }
-                .first()
+
     override fun doWork(): Result {
         Log.d("ugh", "work triggered")
         // get the data
