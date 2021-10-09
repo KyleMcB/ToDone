@@ -163,7 +163,7 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
                     )
                 }
             }
-            LazyColumn() {
+            LazyColumn(modifier = Modifier.wrapContentSize()) {
                 items(dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }) { stateTask ->
                     var detialCompDialog = mutableStateOf(false)
                     TaskQuickComplete(
@@ -204,12 +204,17 @@ fun TaskQuickComplete(
     TaskListItem(
         task,
         {
-            Surface(
-                color = MaterialTheme.colors.secondary,
-                shape = CircleShape,
-                modifier = Modifier.size(50.dp),
-                elevation = 10.dp
-            ) { Box(contentAlignment = Alignment.Center) { Text(task.defaultAmount.toString()) } }
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                Surface(
+                    color = MaterialTheme.colors.secondary,
+                    shape = CircleShape,
+                    modifier =
+                        Modifier.size(50.dp).clip(CircleShape).clickable { onCreateCompletion() },
+                    elevation = 10.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) { Text(task.defaultAmount.toString()) }
+                }
+            }
 
             //                Icon(imageVector = Icons.Default.Done, contentDescription =
             // "create Completion")

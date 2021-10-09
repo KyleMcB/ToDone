@@ -117,16 +117,20 @@ fun ListItemLayout(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(1f).padding(10.dp)
+        modifier =
+            Modifier
+                //                .clip(RoundedCornerShape(20))
+                //                .shadow(elevation = 3.dp, shape = RoundedCornerShape(2))
+                .padding(10.dp)
+                .fillMaxWidth(1f)
+                .then(modifier)
     ) {
-        Column() {
+        Column(modifier = Modifier.padding(15.dp)) {
             ProvideTextStyle(value = MaterialTheme.typography.overline, overlineText)
             ProvideTextStyle(value = MaterialTheme.typography.subtitle1, text)
             ProvideTextStyle(value = MaterialTheme.typography.body2, secondaryText)
         }
         trailing()
-        //        Text("1")
-        //        Text("2")
     }
 }
 
