@@ -25,9 +25,9 @@ class DataModel(application: Application) : AndroidViewModel(application) {
     private val _source: Source
         get() = _sourcej // force it to use the interface so copies can not be made
     private val _list = mutableStateOf(_source, neverEqualPolicy())
-    private val _selectedTab = mutableStateOf(SortMethod.RATE)
+    private val _selectedSortTab = mutableStateOf(SortMethod.RATE)
     val selectedTab
-        get() = _selectedTab.value
+        get() = _selectedSortTab.value
     @ExperimentalTime
     val list: List<Task>
         get() =
@@ -87,7 +87,7 @@ class DataModel(application: Application) : AndroidViewModel(application) {
         }
 
     fun onTabSelect(sortMethod: SortMethod) {
-        _selectedTab.value = sortMethod
+        _selectedSortTab.value = sortMethod
         reComposeList()
     }
 

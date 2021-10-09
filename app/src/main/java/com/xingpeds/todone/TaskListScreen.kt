@@ -220,10 +220,6 @@ fun TaskQuickComplete(
                     Box(contentAlignment = Alignment.Center) { Text(task.defaultAmount.toString()) }
                 }
             }
-
-            //                Icon(imageVector = Icons.Default.Done, contentDescription =
-            // "create Completion")
-
         },
         modifier = modifier.shadow(elevation = 3.dp, shape = RoundedCornerShape(20)),
         secondary = { Text(seconday) }

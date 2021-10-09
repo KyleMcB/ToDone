@@ -48,16 +48,25 @@ data class TaskJson(
     override val desc: Description,
     override var unit: String,
     override var defaultAmount: Int,
-    @Serializable(with = UUIDSerializer::class) override val id: UUID = UUID.randomUUID()
+    @Serializable(with = UUIDSerializer::class) override val id: UUID = UUID.randomUUID(),
+    override var daysWindow: Int = 7
 ) : Task {
 
     // this probably isn't going to serialize properly. need to do private constructor trick
     private val comps: MutableSet<CompJson> = mutableSetOf()
+
     override fun createCompletion(units: Int, description: Description): Completion {
         val comp = CompJson(units, desc = description)
         comps.add(comp)
         return comp
     }
+
+    override val avgCompPerWindow: Float
+        get() {
+            if (this.isEmpty()) return 0f
+            val numOfWindows = this.daysSinceCreated.toFloat() / this.daysWindow
+            return this.size / numOfWindows
+        }
 
     override val avgCompPerWeek: Float
         get() {
@@ -73,11 +82,16 @@ data class TaskJson(
             val numOf30Days = this.daysSinceCreated / 30f
             return this.size / numOf30Days
         }
+    override val avgUnitPerWindow: Float
+        get() =
+            unitsPerWindow.sum().toFloat() / unitsPerWindow.size.apply { if (this == 0) return 1f }
     override val avgUnitPerWeek: Float
         get() = unitsPerWeek.sum().toFloat() / unitsPerWeek.size.apply { if (this == 0) return 1f }
     override val avgUnitPer30Days: Float
         get() =
             unitsPer30days.sum().toFloat() / unitsPer30days.size.apply { if (this == 0) return 1f }
+    override val numOfCompsLastWindow: Int
+        get() = this.compsLastWindow.size
     val compsLast7days: List<Completion>
         get() =
             this.filter {
@@ -105,12 +119,33 @@ data class TaskJson(
             this.filter {
                 it.timeStamp in Clock.System.now() - Duration.days(30)..Clock.System.now()
             }
+    val compsLastWindow: List<Completion>
+        get() =
+            this.filter {
+                it.timeStamp in Clock.System.now() - Duration.days(daysWindow)..Clock.System.now()
+            }
     override val numOfCompsLast30Days: Int
         get() = this.compsLast30days.size
+    override val UnitsInLastWindow: Int
+        get() = this.compsLastWindow.sumOf { it.units }
     override val unitsInLast7Days: Int
         get() = this.compsLast7days.sumOf { it.units }
     override val unitsInLast30Days: Int
         get() = this.compsLast30days.sumOf { it.units }
+    override val stdDev: Float
+        get() {
+            // if we only have 1 or 0 data points or if they are all in the same windows -> escape
+            // hatch
+            if (this.size < 2 || unitsPerWindow.size < 2) return 0f
+            val windows = unitsPerWindow
+            val mean: Float = windows.sum().toFloat() / windows.size.toFloat()
+            val windowDeviations: List<Float> =
+                List(windows.size) {
+                    val deviation = windows[it] - mean
+                    (deviation * deviation)
+                }
+            return sqrt(windowDeviations.sum() / (windowDeviations.size - 1f))
+        }
     override val stdDev7days: Float
         get() {
             if (this.isEmpty() || this.size == 1) return 0f
@@ -136,6 +171,17 @@ data class TaskJson(
                     (dev * dev)
                 }
             return sqrt(monthDeviations.sum() / (monthDeviations.size.toFloat() - 1f))
+        }
+    override val unitsPerWindow: List<Int>
+        get() {
+            if (this.isEmpty()) return emptyList()
+            val windows: MutableList<Int> = MutableList(daysWindow + 1) { 0 }
+            forEach {
+                val window: Int =
+                    (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / daysWindow
+                windows[window] += it.units
+            }
+            return windows
         }
     override val unitsPer30days: List<Int>
         get() {
