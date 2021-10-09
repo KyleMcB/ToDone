@@ -13,7 +13,9 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -95,13 +97,37 @@ fun TaskListItem(
     modifier: Modifier = Modifier
 ) {
 
-    ListItem(
+    ListItemLayout(
         modifier = modifier,
         text = { Text(text = task.name) },
         overlineText = { if (task.lastOrNull() != null) PreviousCompTime(comp = task.last()) },
         trailing = { TrailingButton() },
         secondaryText = secondary
     )
+}
+
+@Composable
+fun ListItemLayout(
+    modifier: Modifier,
+    text: @Composable () -> Unit,
+    overlineText: @Composable () -> Unit,
+    trailing: @Composable () -> Unit,
+    secondaryText: @Composable () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(1f).padding(10.dp)
+    ) {
+        Column() {
+            ProvideTextStyle(value = MaterialTheme.typography.overline, overlineText)
+            ProvideTextStyle(value = MaterialTheme.typography.subtitle1, text)
+            ProvideTextStyle(value = MaterialTheme.typography.body2, secondaryText)
+        }
+        trailing()
+        //        Text("1")
+        //        Text("2")
+    }
 }
 
 @Composable
