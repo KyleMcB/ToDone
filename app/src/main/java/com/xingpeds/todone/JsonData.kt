@@ -68,28 +68,10 @@ data class TaskJson(
             return this.size / numOfWindows
         }
 
-    override val avgCompPerWeek: Float
-        get() {
-            if (this.isEmpty()) return 0f
-            val numOfDays = this.daysSinceCreated
-            val numOfWeeks: Float = numOfDays.toFloat() / 7f
-
-            return this.size / numOfWeeks
-        }
-    override val avgCompPer30Days: Float
-        get() {
-            if (this.isEmpty()) return 0f
-            val numOf30Days = this.daysSinceCreated / 30f
-            return this.size / numOf30Days
-        }
     override val avgUnitPerWindow: Float
         get() =
             unitsPerWindow.sum().toFloat() / unitsPerWindow.size.apply { if (this == 0) return 1f }
-    override val avgUnitPerWeek: Float
-        get() = unitsPerWeek.sum().toFloat() / unitsPerWeek.size.apply { if (this == 0) return 1f }
-    override val avgUnitPer30Days: Float
-        get() =
-            unitsPer30days.sum().toFloat() / unitsPer30days.size.apply { if (this == 0) return 1f }
+
     override val numOfCompsLastWindow: Int
         get() = this.compsLastWindow.size
     val compsLast7days: List<Completion>
@@ -111,8 +93,6 @@ data class TaskJson(
         get() {
             return daysSinceCreated / 30
         }
-    override val numOfCompsLast7Days: Int
-        get() = this.compsLast7days.size
 
     val compsLast30days: List<Completion>
         get() =
@@ -124,14 +104,10 @@ data class TaskJson(
             this.filter {
                 it.timeStamp in Clock.System.now() - Duration.days(daysWindow)..Clock.System.now()
             }
-    override val numOfCompsLast30Days: Int
-        get() = this.compsLast30days.size
+
     override val unitsInLastWindow: Int
         get() = this.compsLastWindow.sumOf { it.units }
-    override val unitsInLast7Days: Int
-        get() = this.compsLast7days.sumOf { it.units }
-    override val unitsInLast30Days: Int
-        get() = this.compsLast30days.sumOf { it.units }
+
     override val stdDev: Float
         get() {
             // if we only have 1 or 0 data points or if they are all in the same windows -> escape
@@ -146,63 +122,18 @@ data class TaskJson(
                 }
             return sqrt(windowDeviations.sum() / (windowDeviations.size - 1f))
         }
-    override val stdDev7days: Float
-        get() {
-            if (this.isEmpty() || this.size == 1) return 0f
-            val weeks = unitsPerWeek
-            if (weeks.size < 2) return 0f
-            val mean: Float = weeks.sum().toFloat() / weeks.size.toFloat()
-            val weekDeviations: List<Float> =
-                List<Float>(weeks.size) {
-                    val dev = weeks[it] - mean
-                    (dev * dev)
-                }
-            return sqrt(weekDeviations.sum().toFloat() / (weekDeviations.size.toFloat() - 1f))
-        }
-    override val stdDev30days: Float
-        get() {
-            if (isEmpty() || size == 1) return 0f
-            val months = unitsPer30days
-            if (months.size < 2) return 0f
-            val mean = months.sum().toFloat() / months.size.toFloat()
-            val monthDeviations: List<Float> =
-                List<Float>(months.size) {
-                    val dev = months[it] - mean
-                    (dev * dev)
-                }
-            return sqrt(monthDeviations.sum() / (monthDeviations.size.toFloat() - 1f))
-        }
+
     override val unitsPerWindow: List<Int>
         get() {
             if (this.isEmpty()) return emptyList()
-            val windows: MutableList<Int> = MutableList(daysWindow + 1) { 0 }
+            val windows: MutableList<Int> =
+                MutableList((daysSinceCreated.toInt() / daysWindow) + 1) { 0 }
             forEach {
                 val window: Int =
                     (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / daysWindow
                 windows[window] += it.units
             }
             return windows
-        }
-    override val unitsPer30days: List<Int>
-        get() {
-            if (this.isEmpty()) return emptyList()
-            val _30days = _30DaysSinceCreate
-            val months: MutableList<Int> = MutableList<Int>(_30days.toInt() + 1) { 0 }
-            forEach {
-                val month: Int = (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / 30
-                months[month] += it.units
-            }
-            return months
-        }
-    override val unitsPerWeek: List<Int>
-        get() {
-            if (this.isEmpty()) return emptyList()
-            val weeks: MutableList<Int> = MutableList<Int>(weeksSinceCreated.toInt() + 1) { 0 }
-            forEach {
-                val week: Int = (Clock.System.now() - it.timeStamp).inWholeDays.toInt() / 7
-                weeks[week] += it.units
-            }
-            return weeks.toList()
         }
 
     override fun hashCode(): Int {

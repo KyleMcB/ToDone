@@ -36,23 +36,16 @@ sealed interface Task : MutableSet<Completion> {
         description: Description = Description()
     ): Completion
     val avgCompPerWindow: Float
-    val avgCompPerWeek: Float
-    val avgCompPer30Days: Float
+
     val avgUnitPerWindow: Float
-    val avgUnitPerWeek: Float
-    val avgUnitPer30Days: Float
+
     val numOfCompsLastWindow: Int
-    val numOfCompsLast7Days: Int
-    val numOfCompsLast30Days: Int
+
     val unitsInLastWindow: Int
-    val unitsInLast7Days: Int
-    val unitsInLast30Days: Int
+
     val stdDev: Float
-    val stdDev7days: Float
-    val stdDev30days: Float
+
     val unitsPerWindow: List<Int>
-    val unitsPerWeek: List<Int>
-    val unitsPer30days: List<Int>
 
     val daysSinceCreated: Long
 

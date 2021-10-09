@@ -11,13 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.xingpeds.todone.rate.rateLast7days
+import com.xingpeds.todone.rate.rateLastWindow
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 
 @ExperimentalTime
 class DataModel(application: Application) : AndroidViewModel(application) {
@@ -33,12 +32,12 @@ class DataModel(application: Application) : AndroidViewModel(application) {
         get() =
             when (selectedTab) {
                 SortMethod.RATE -> {
-                    _list.value.groupBy { it.rateLast7days() }.flatMap { it.value }
+                    _list.value.groupBy { it.rateLastWindow() }.flatMap { it.value }
                 }
                 SortMethod.UNITS -> {
 
                     _list.value.toList().groupBy { it.unit }.flatMap { entry ->
-                        entry.value.sortedBy { it.unitsInLast7Days }
+                        entry.value.sortedBy { it.unitsInLastWindow }
                     }
                 }
                 SortMethod.TIME -> {
@@ -89,35 +88,5 @@ class DataModel(application: Application) : AndroidViewModel(application) {
     fun onTabSelect(sortMethod: SortMethod) {
         _selectedSortTab.value = sortMethod
         reComposeList()
-    }
-
-    @ExperimentalTime
-    class TaskSorter(val sortMethod: SortMethod) : Comparator<Task> {
-        override fun compare(p0: Task?, p1: Task?): Int {
-            if (p0 == null) {
-                return 1
-            }
-            if (p1 == null) {
-                return -1
-            }
-            requireNotNull(p1)
-            requireNotNull(p0)
-            when (sortMethod) {
-                SortMethod.RATE ->
-                    return ((p0.stdDev7days - p0.unitsInLast7Days) -
-                            (p1.stdDev7days - p1.unitsInLast7Days))
-                        .toInt()
-                SortMethod.UNITS -> {
-                    return ((p0.unitsInLast7Days) - (p1.unitsInLast7Days)) +
-                        if (p0.unit.lowercase() > p1.unit.lowercase()) Int.MIN_VALUE
-                        else Int.MAX_VALUE
-                }
-                SortMethod.TIME -> {
-                    val a = p0.lastOrNull()?.timeStamp ?: Instant.DISTANT_PAST
-                    val b = p1.lastOrNull()?.timeStamp ?: Instant.DISTANT_PAST
-                    return a.compareTo(b)
-                }
-            }
-        }
     }
 }

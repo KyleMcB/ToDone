@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.xingpeds.todone.rate.maintianRange7Day
+import com.xingpeds.todone.rate.maintianRange
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
@@ -101,10 +101,10 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
             )
 
             Divider(modifier = Modifier.padding(10.dp))
-            Text("completed ${task.numOfCompsLast7Days} times in last 7 days")
-            Text("total of ${task.unitsInLast7Days} ${task.unit} in last 7 days")
-            Text("weekly standard deviation ${task.stdDev7days}")
-            Text("maintanence range ${task.maintianRange7Day}")
+            Text("completed ${task.numOfCompsLastWindow} times in last 7 days")
+            Text("total of ${task.unitsInLastWindow} ${task.unit} in last 7 days")
+            Text("weekly standard deviation ${task.stdDev}")
+            Text("maintanence range ${task.maintianRange}")
             Divider(modifier = Modifier.padding(10.dp))
             Text("Completions")
             LazyColumn(

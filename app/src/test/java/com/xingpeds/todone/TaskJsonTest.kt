@@ -11,7 +11,7 @@ import com.xingpeds.todone.TaskJson
 import com.xingpeds.todone.rate.Accelerating
 import com.xingpeds.todone.rate.Declining
 import com.xingpeds.todone.rate.Maintaining
-import com.xingpeds.todone.rate.rateLast7days
+import com.xingpeds.todone.rate.rateLastWindow
 import java.util.UUID
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -135,65 +135,65 @@ internal class TaskJsonTest {
     @Test
     fun avgCompsPerWeeks() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals("task with no completions has average of zero", 0f, task.avgCompPerWeek)
+        assertEquals("task with no completions has average of zero", 0f, task.avgCompPerWindow)
         val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
         task.add(comp1)
-        assertEquals(7f / 9f, task.avgCompPerWeek)
+        assertEquals(7f / 9f, task.avgCompPerWindow)
     }
     @ExperimentalTime
     @Test
     fun avgCompsPer30days() {
-        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0f, task.avgCompPer30Days)
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
+        assertEquals(0f, task.avgCompPerWindow)
         val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
         task.add(comp1)
-        assertEquals(30f / 9f, task.avgCompPer30Days)
+        assertEquals(30f / 9f, task.avgCompPerWindow)
     }
     @Test
     fun compsLast7Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0, task.numOfCompsLast7Days)
+        assertEquals(0, task.numOfCompsLastWindow)
         val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
         task.add(comp1)
-        assertEquals(0, task.numOfCompsLast7Days)
+        assertEquals(0, task.numOfCompsLastWindow)
         task.add(CompJson(1, Clock.System.now() - Duration.days(2)))
-        assertEquals(1, task.numOfCompsLast7Days)
+        assertEquals(1, task.numOfCompsLastWindow)
     }
     @Test
     fun compsLast30Days() {
-        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0, task.numOfCompsLast30Days)
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
+        assertEquals(0, task.numOfCompsLastWindow)
         task.add(CompJson(1, Clock.System.now() - Duration.days(2)))
-        assertEquals(1, task.numOfCompsLast30Days)
+        assertEquals(1, task.numOfCompsLastWindow)
         task.add(CompJson(1, Clock.System.now() - Duration.days(31)))
-        assertEquals(1, task.numOfCompsLast30Days)
+        assertEquals(1, task.numOfCompsLastWindow)
     }
     @Test
     fun unitsLast7Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0, task.unitsInLast7Days)
+        assertEquals(0, task.unitsInLastWindow)
         task.add(CompJson(30))
-        assertEquals(30, task.unitsInLast7Days)
+        assertEquals(30, task.unitsInLastWindow)
         task.add(CompJson(30, Clock.System.now() - Duration.days(9)))
-        assertEquals(30, task.unitsInLast7Days)
+        assertEquals(30, task.unitsInLastWindow)
     }
     @Test
     fun unitsLast30Days() {
-        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0, task.unitsInLast30Days)
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
+        assertEquals(0, task.unitsInLastWindow)
         task.add(CompJson(30))
         task.add(CompJson(50))
         task.add(CompJson(50, Clock.System.now() - Duration.days(31)))
-        assertEquals(30 + 50, task.unitsInLast30Days)
+        assertEquals(30 + 50, task.unitsInLastWindow)
     }
     @Test
     fun unitsPerWeek() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0, task.unitsPerWeek.size)
+        assertEquals(0, task.unitsPerWindow.size)
         task.add(CompJson(30))
-        assertEquals(1, task.unitsPerWeek.size)
-        task.add(CompJson(30, Clock.System.now() - Duration.days(7)))
-        assertEquals(2, task.unitsPerWeek.size)
+        assertEquals(1, task.unitsPerWindow.size)
+        task.add(CompJson(30, Clock.System.now() - Duration.days(task.daysWindow + 1)))
+        assertEquals(2, task.unitsPerWindow.size)
     }
     @Test
     fun stdDevWeek() {
@@ -201,26 +201,26 @@ internal class TaskJsonTest {
         task.add(CompJson(13))
         task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
-        assertEquals(2f * sqrt(7f / 3f), task.stdDev7days)
+        assertEquals(2f * sqrt(7f / 3f), task.stdDev)
     }
     @Test
     fun unitsPer30days() {
-        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        assertEquals(0, task.unitsPer30days.size)
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
+        assertEquals(0, task.unitsPerWindow.size)
         task.add(CompJson(30))
-        assertEquals(1, task.unitsPer30days.size)
+        assertEquals(1, task.unitsPerWindow.size)
         task.add(CompJson(30, Clock.System.now() - Duration.days(7)))
-        assertEquals(1, task.unitsPer30days.size)
+        assertEquals(1, task.unitsPerWindow.size)
         task.add(CompJson(30, Clock.System.now() - Duration.days(32)))
-        assertEquals(2, task.unitsPer30days.size)
+        assertEquals(2, task.unitsPerWindow.size)
     }
     @Test
     fun stdDev30Days() {
-        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         task.add(CompJson(13))
         task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
-        assertEquals(2f * sqrt(7f / 3f), task.stdDev30days)
+        assertEquals(2f * sqrt(7f / 3f), task.stdDev)
     }
     @Test
     fun avgUnitPerWeek() {
@@ -228,15 +228,15 @@ internal class TaskJsonTest {
         task.add(CompJson(13))
         task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
-        assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPerWeek)
+        assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPerWindow)
     }
     @Test
     fun avgUnits30Days() {
-        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
+        val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         task.add(CompJson(13))
         task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
         task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
-        assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPer30Days)
+        assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPerWindow)
     }
     @Test
     fun rate7DayOfDecline() {
@@ -248,7 +248,7 @@ internal class TaskJsonTest {
             add(CompJson(80, Clock.System.now() - Duration.days(22)))
             add(CompJson(50))
         }
-        assert(task.rateLast7days() is Declining)
+        assert(task.rateLastWindow() is Declining)
     }
     @Test
     fun rate7DayOfMaintain() {
@@ -259,7 +259,7 @@ internal class TaskJsonTest {
             add(CompJson(80, Clock.System.now() - Duration.days(22)))
             add(CompJson(100))
         }
-        assert(task.rateLast7days() is Maintaining)
+        assert(task.rateLastWindow() is Maintaining)
     }
     @Test
     fun rate7DaysOfAccel() {
@@ -270,6 +270,6 @@ internal class TaskJsonTest {
             add(CompJson(80, Clock.System.now() - Duration.days(22)))
             add(CompJson(130))
         }
-        assert(task.rateLast7days() is Accelerating)
+        assert(task.rateLastWindow() is Accelerating)
     }
 }

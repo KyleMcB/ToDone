@@ -195,10 +195,10 @@ fun TaskQuickComplete(
 
     val seconday =
         when (sortMethod) {
-            DataModel.SortMethod.RATE -> task.rateLast7days().toString()
+            DataModel.SortMethod.RATE -> task.rateLastWindow().toString()
             DataModel.SortMethod.TIME -> task.lastOrNull()?.desc?.text ?: "no description"
             DataModel.SortMethod.UNITS ->
-                "${task.unitsInLast7Days}: ${task.unit} recorded in the last 7 days"
+                "${task.unitsInLastWindow}: ${task.unit} recorded in the last 7 days"
         }
     TaskListItem(
         task,
