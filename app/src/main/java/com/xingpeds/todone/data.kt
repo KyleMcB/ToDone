@@ -44,7 +44,7 @@ sealed interface Task : MutableSet<Completion> {
     val numOfCompsLastWindow: Int
     val numOfCompsLast7Days: Int
     val numOfCompsLast30Days: Int
-    val UnitsInLastWindow: Int
+    val unitsInLastWindow: Int
     val unitsInLast7Days: Int
     val unitsInLast30Days: Int
     val stdDev: Float

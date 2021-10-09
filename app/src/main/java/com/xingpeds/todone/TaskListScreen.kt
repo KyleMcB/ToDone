@@ -140,7 +140,6 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = { AppBarNavigation(scaffoldState = scaffoldState) },
-        bottomBar = { TaskListBottomBar(model = dataModel) },
         drawerContent = { DrawerContent(navController = navController) },
         floatingActionButton = {
             FloatingActionButton(onClick = { openDialog.value = true }) {
@@ -181,11 +180,6 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
             }
         }
     }
-}
-
-@Composable
-fun TaskListBottomBar(model: DataModel) {
-    TabRow(selectedTabIndex = 0) { Tab(selected = true, onClick = {}, text = { Text("tabName") }) }
 }
 
 @ExperimentalTime

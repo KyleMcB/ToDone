@@ -126,7 +126,7 @@ data class TaskJson(
             }
     override val numOfCompsLast30Days: Int
         get() = this.compsLast30days.size
-    override val UnitsInLastWindow: Int
+    override val unitsInLastWindow: Int
         get() = this.compsLastWindow.sumOf { it.units }
     override val unitsInLast7Days: Int
         get() = this.compsLast7days.sumOf { it.units }
