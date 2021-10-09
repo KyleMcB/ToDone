@@ -28,7 +28,7 @@ import kotlinx.datetime.periodUntil
 
 @ExperimentalTime
 class MainActivity : ComponentActivity() {
-    private val model: DataModel by viewModels<DataModel>()
+    private val model: DataModel by viewModels()
     private val exporter =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
             if (uri != null) contentResolver.openOutputStream(uri)?.use { model.onExport(it) }
@@ -83,9 +83,9 @@ class MainActivity : ComponentActivity() {
 }
 
 private fun String?.toUUID(): UUID {
-    if (this != null) {
-        return UUID.fromString(this)
-    } else return UUID.randomUUID()
+    return if (this != null) {
+        UUID.fromString(this)
+    } else UUID.randomUUID()
 }
 
 @ExperimentalMaterialApi
@@ -93,8 +93,8 @@ private fun String?.toUUID(): UUID {
 fun TaskListItem(
     task: Task,
     TrailingButton: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     secondary: @Composable () -> Unit = { LastCompDescription(task = task) },
-    modifier: Modifier = Modifier
 ) {
 
     ListItemLayout(
@@ -135,7 +135,7 @@ fun ListItemLayout(
 }
 
 @Composable
-public fun LastCompDescription(task: Task) {
+fun LastCompDescription(task: Task) {
     val comps = task.filterNotNull()
     if (comps.isNotEmpty() && comps.last().desc.text != null) {
         Text("Last ->" + comps.last().desc.text!!)
@@ -156,5 +156,5 @@ fun PreviousCompTime(comp: Completion) {
         if (timeDistance.hours > 0) append("${timeDistance.hours} hours ")
         if (this.any()) append("ago") else append("completed recently")
     }
-    Column() { Text(build.toString()) }
+    Column { Text(build.toString()) }
 }

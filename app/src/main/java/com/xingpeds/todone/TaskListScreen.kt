@@ -136,7 +136,6 @@ fun DetailedTaskCompletionDialog(
 @Composable
 fun TaskListScreen(dataModel: DataModel, navController: NavController) {
     val openDialog = remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         scaffoldState = scaffoldState,
@@ -165,7 +164,7 @@ fun TaskListScreen(dataModel: DataModel, navController: NavController) {
             }
             LazyColumn(modifier = Modifier.wrapContentSize()) {
                 items(dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }) { stateTask ->
-                    var detialCompDialog = mutableStateOf(false)
+                    val detialCompDialog = mutableStateOf(false)
                     TaskQuickComplete(
                         mtask = stateTask,
                         {
