@@ -6,7 +6,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.30'
 }
 
 android {
@@ -16,13 +16,15 @@ android {
         applicationId "com.xingpeds.todone"
         minSdk 27
         targetSdk 31
-        versionCode 9
+        versionCode 10
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
         }
+        signingConfig signingConfigs.debug
+
     }
 
     buildTypes {
