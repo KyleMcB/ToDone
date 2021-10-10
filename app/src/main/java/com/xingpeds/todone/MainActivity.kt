@@ -122,7 +122,7 @@ fun ListItemLayout(
                 //                .clip(RoundedCornerShape(20))
                 //                .shadow(elevation = 3.dp, shape = RoundedCornerShape(2))
                 .padding(10.dp)
-                .fillMaxWidth(1f)
+                .fillMaxWidth()
                 .then(modifier)
     ) {
         Column(modifier = Modifier.padding(15.dp)) {
@@ -130,6 +130,7 @@ fun ListItemLayout(
             ProvideTextStyle(value = MaterialTheme.typography.subtitle1, text)
             ProvideTextStyle(value = MaterialTheme.typography.body2, secondaryText)
         }
+        // why isn't this at the end?
         trailing()
     }
 }

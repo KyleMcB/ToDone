@@ -192,7 +192,6 @@ fun TaskQuickComplete(
     sortMethod: DataModel.SortMethod
 ) {
     val task = mtask.value
-
     val seconday =
         when (sortMethod) {
             DataModel.SortMethod.RATE -> task.rateLastWindow().toString()
