@@ -8,8 +8,6 @@ package com.xingpeds.todone
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -17,6 +15,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,13 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.xingpeds.todone.rate.maintianRange
+import java.lang.NumberFormatException
 import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
@@ -99,24 +98,31 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
                     dataModel.save()
                 }
             )
-
             Divider(modifier = Modifier.padding(10.dp))
-            Text("completed ${task.numOfCompsLastWindow} times in last 7 days")
-            Text("total of ${task.unitsInLastWindow} ${task.unit} in last 7 days")
-            Text("weekly standard deviation ${task.stdDev}")
+            DetailTaskDaysWindow(
+                task.daysWindow,
+                onChange = { amount ->
+                    task.daysWindow = amount
+                    dataModel.save()
+                }
+            )
+            Divider(modifier = Modifier.padding(10.dp))
+            Text("completed ${task.numOfCompsLastWindow} times in last ${task.daysWindow} days")
+            Text("total of ${task.unitsInLastWindow} ${task.unit} in last ${task.daysWindow} days")
+            Text("standard deviation ${task.stdDev}")
             Text("maintanence range ${task.maintianRange}")
             Divider(modifier = Modifier.padding(10.dp))
-            Text("Completions")
-            LazyColumn(
-                modifier = Modifier.padding(10.dp).weight(1f),
-                contentPadding = PaddingValues(horizontal = 2.dp, vertical = 5.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(task.toList().sortedByDescending { it.timeStamp }) { comp ->
-                    CompletionItem(comp)
-                }
-            }
-            Divider()
+            //            Text("Completions")
+            //            LazyColumn(
+            //                modifier = Modifier.padding(10.dp).weight(1f),
+            //                contentPadding = PaddingValues(horizontal = 2.dp, vertical = 5.dp),
+            //                verticalArrangement = Arrangement.spacedBy(4.dp)
+            //            ) {
+            //                items(task.toList().sortedByDescending { it.timeStamp }) { comp ->
+            //                    CompletionItem(comp)
+            //                }
+            //            }
+            //            Divider()
             DeleteTaskOption(
                 onDelete = {
                     dataModel.deleteTask(task)
@@ -131,68 +137,92 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
 }
 
 @Composable
-fun DetailTaskScreenDefaultAmount(value: Int, onChange: (Int) -> Unit) {
-    var editing: Boolean by remember { mutableStateOf(false) }
-    var valid: Boolean by remember { mutableStateOf(true) }
-    Row() {
-        if (editing) {
-            TextField(
-                value = value.toString(),
-                onValueChange = {
-                    try {
-                        if (it.isBlank()) onChange(0) else onChange(it.toInt())
-                        valid = true
-                    } catch (e: Throwable) {
-                        valid = false
-                    }
-                },
-                placeholder = { Text("Default amount for quick complete") },
-                keyboardActions = KeyboardActions(onDone = { editing = false }),
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = !valid
-            )
-            IconButton(onClick = { editing = false }) {
-                Icon(Icons.Default.Done, "finished editing")
-            }
+fun DetailTaskDaysWindow(daysWindow: Int, onChange: (Int) -> Unit) {
+    var enabled by remember { mutableStateOf(false) }
+    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+        NumberOutlinedTextField(daysWindow, enabled, onChange, "Window length (days)")
+        if (enabled) {
+            IconButton(onClick = { enabled = !enabled }) { Icon(Icons.Default.Save, "save") }
         } else {
-            Text(
-                text = value.toString(),
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { editing = true }) { Icon(Icons.Default.Edit, "edit") }
+            IconButton(onClick = { enabled = !enabled }) {
+                Icon(Icons.Default.Edit, "Edit window length")
+            }
+        }
+    }
+}
+
+@Composable
+private fun NumberOutlinedTextField(
+    number: Int,
+    enable: Boolean,
+    onChange: (Int) -> Unit,
+    label: String? = null
+) {
+    var value by remember { mutableStateOf(number.toString()) }
+    var valid by remember { mutableStateOf(true) }
+    OutlinedTextField(
+        value = value.toString(),
+        onValueChange = {
+            value = it
+            try {
+                val temp: Int = it.toInt()
+                onChange(temp)
+                valid = true
+            } catch (e: NumberFormatException) {
+                valid = false
+            }
+        },
+        isError = !valid,
+        label = { if (label != null) Text(label) },
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions =
+            KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        enabled = enable
+    )
+}
+
+@Composable
+fun DetailTaskScreenDefaultAmount(value: Int, onChange: (Int) -> Unit) {
+    var enabled: Boolean by remember { mutableStateOf(false) }
+    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+        NumberOutlinedTextField(
+            number = value,
+            enable = enabled,
+            onChange = onChange,
+            "Amount for quick complete"
+        )
+        IconButton(onClick = { enabled = !enabled }) {
+            if (enabled) {
+                Icon(Icons.Default.Save, null)
+            } else {
+                Icon(Icons.Default.Edit, null)
+            }
         }
     }
 }
 
 @Composable
 fun DetailTaskScreenUnits(name: String, onChange: (String) -> Unit) {
-    var editing: Boolean by remember { mutableStateOf(false) }
+    var enable: Boolean by remember { mutableStateOf(false) }
 
-    Row() {
-        if (editing) {
-            TextField(
-                value = name,
-                onValueChange = onChange,
-                placeholder = { Text("Miles, Minutes, Calories, etc....") },
-                keyboardActions = KeyboardActions(onDone = { editing = false }),
-                singleLine = true,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { editing = false }) {
-                Icon(Icons.Default.Done, "finished editing")
+    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = name,
+            onValueChange = onChange,
+            placeholder = { Text("Miles, Minutes, Calories, etc....") },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { enable = false }),
+            singleLine = true,
+            label = { Text("Unit of measurement") },
+            enabled = enable
+        )
+        IconButton(onClick = { enable = !enable }) {
+            if (enable) {
+                Icon(Icons.Default.Save, null)
+            } else {
+                Icon(Icons.Default.Edit, null)
             }
-        } else {
-            Text(
-                text = name,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { editing = true }) { Icon(Icons.Default.Edit, "edit") }
         }
     }
 }
@@ -213,10 +243,9 @@ fun DeleteTaskOption(onDelete: () -> Unit) {
                                 onDelete()
                             }
                         ) { Text("Confirm") }
-                        TextButton(
-                            modifier = Modifier.weight(1f),
-                            onClick = { showDialog = false }
-                        ) { Text("Cancel") }
+                        Button(modifier = Modifier.weight(1f), onClick = { showDialog = false }) {
+                            Text("Cancel")
+                        }
                     }
                 }
             }
@@ -227,51 +256,44 @@ fun DeleteTaskOption(onDelete: () -> Unit) {
 
 @Composable
 fun DetailTaskScreenDescription(desc: String, onChange: (String) -> Unit) {
-    var editing: Boolean by remember { mutableStateOf(false) }
-    Row() {
-        if (editing) {
-            TextField(value = desc, onValueChange = onChange)
-            IconButton(onClick = { editing = false }) {
-                Icon(Icons.Default.Done, "finished editing")
-            }
-        } else {
-
-            Text(
-                desc,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { editing = true }) { Icon(Icons.Default.Edit, "edit") }
+    var enable: Boolean by remember { mutableStateOf(false) }
+    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = desc,
+            onValueChange = onChange,
+            label = { Text("Description of task") },
+            enabled = enable,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { enable = false })
+        )
+        IconButton(onClick = { enable = !enable }) {
+            if (enable) {
+                Icon(Icons.Default.Done, null)
+            } else Icon(Icons.Default.Edit, null)
         }
     }
 }
 
 @Composable
 fun DetailTaskScreenTaskName(name: String, onChange: (String) -> Unit) {
-    var editing: Boolean by remember { mutableStateOf(false) }
+    var enable: Boolean by remember { mutableStateOf(false) }
 
-    Row() {
-        if (editing) {
-            TextField(
-                value = name,
-                onValueChange = onChange,
-                placeholder = { Text("Task name") },
-                keyboardActions = KeyboardActions(onDone = { editing = false }),
-                singleLine = true,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { editing = false }) {
-                Icon(Icons.Default.Done, "finished editing")
-            }
-        } else {
-            Text(
-                text = name,
-                fontSize = 30.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { editing = true }) { Icon(Icons.Default.Edit, "edit") }
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+    ) {
+        OutlinedTextField(
+            value = name,
+            onValueChange = onChange,
+            placeholder = { Text("Task name") },
+            keyboardActions = KeyboardActions(onDone = { enable = false }),
+            singleLine = true,
+            label = { Text("Task Name") },
+            enabled = enable
+        )
+
+        IconButton(onClick = { enable = !enable }) {
+            if (enable) Icon(Icons.Default.Save, null) else Icon(Icons.Default.Edit, null)
         }
     }
 }
