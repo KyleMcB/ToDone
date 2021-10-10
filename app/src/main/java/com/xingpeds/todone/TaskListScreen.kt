@@ -114,13 +114,14 @@ fun DetailedTaskCompletionDialog(
         ) {
             OutlinedTextField(
                 value = unitString,
+                isError = error,
                 onValueChange = {
+                    unitString = it
+
                     try {
-                        unitString = it
                         units = unitString.toInt()
                         error = false
                     } catch (e: NumberFormatException) {
-                        unitString = it
                         error = true
                     }
                 },
@@ -214,7 +215,7 @@ fun TaskQuickComplete(
     TaskListItem(
         task,
         {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 10.dp)) {
                 Surface(
                     color = MaterialTheme.colors.secondary,
                     shape = CircleShape,

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 fun AppBarNavigation(scaffoldState: ScaffoldState) {
     val scope = rememberCoroutineScope()
     TopAppBar(
-        title = { Text("S.M.A.R.T GOALS") },
+        title = { Text("ToDone") },
         navigationIcon = {
             IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
                 Icon(Icons.Filled.Menu, contentDescription = null)

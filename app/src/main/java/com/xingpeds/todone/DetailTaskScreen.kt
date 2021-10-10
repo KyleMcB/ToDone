@@ -59,7 +59,10 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
         val taskDescText = remember { mutableStateOf(task.desc.text ?: "") }
         val taskUnits = remember { mutableStateOf(task.unit) }
         val taskDefaultUnits = remember { mutableStateOf(task.defaultAmount) }
-        Column {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxHeight()
+        ) {
             DetailTaskScreenTaskName(
                 taskName.value,
                 onChange = { name ->
@@ -112,6 +115,8 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
             Text("standard deviation ${task.stdDev}")
             Text("maintanence range ${task.maintianRange}")
             Divider(modifier = Modifier.padding(10.dp))
+            // List of completions takes too much room either move editing some where else or more
+            // completions somewhere else
             //            Text("Completions")
             //            LazyColumn(
             //                modifier = Modifier.padding(10.dp).weight(1f),
