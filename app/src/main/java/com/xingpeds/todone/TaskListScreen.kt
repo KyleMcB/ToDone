@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.xingpeds.todone.rate.*
+import java.lang.NumberFormatException
 import kotlin.time.ExperimentalTime
 
 const val mainScreenRoute = "mainScreenRoute"
@@ -103,15 +104,26 @@ fun DetailedTaskCompletionDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         var units: Int by remember { mutableStateOf(defaultAmount) }
+        var unitString by remember { mutableStateOf("") }
         var description: String by remember { mutableStateOf("") }
+        var error by remember { mutableStateOf(false) }
         Column(
             modifier =
                 Modifier.wrapContentSize(Alignment.Center)
                     .background(MaterialTheme.colors.background)
         ) {
             OutlinedTextField(
-                value = units.toString(),
-                onValueChange = { units = it.toIntOrNull() ?: 0 },
+                value = unitString,
+                onValueChange = {
+                    try {
+                        unitString = it
+                        units = unitString.toInt()
+                        error = false
+                    } catch (e: NumberFormatException) {
+                        unitString = it
+                        error = true
+                    }
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = { Text("Measured Amount") }
             )
