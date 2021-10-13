@@ -36,7 +36,6 @@ fun StatsList(dataModel: DataModel, navController: NavController) {
     ) {
         Column() {
             dataModel.list.map { mutableStateOf(it, neverEqualPolicy()) }.forEach { stateTask ->
-                // possibly fragile code, can't call Task(task,{},modifier) directly
                 TaskQuickStats(mtask = stateTask, { id -> navController.navigate("/task/$id") })
             }
         }
