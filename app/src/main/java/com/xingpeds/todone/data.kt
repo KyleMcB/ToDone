@@ -52,6 +52,12 @@ sealed interface Task : MutableSet<Completion> {
     abstract override fun hashCode(): Int
 }
 
+val Task.avgLastWindow: Float
+    get() = unitsInLastWindow.toFloat() / daysWindow
+
+val Task.regularity: Float
+    get() = if (stdDev == 0f) 0f else 1 - (stdDev / avgUnitPerWindow)
+
 sealed interface Source : MutableSet<Task> {
     fun getTaskById(id: UUID): Task
     fun createTask(
