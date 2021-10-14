@@ -43,6 +43,10 @@ class MainActivity : ComponentActivity() {
                 }
         }
 
+    override fun onResume() {
+        super.onResume()
+        model.reComposeList()
+    }
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
