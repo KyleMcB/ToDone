@@ -215,7 +215,10 @@ fun TaskQuickComplete(
     TaskListItem(
         task,
         {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 10.dp)) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.padding(end = 10.dp).defaultMinSize(minWidth = 50.dp)
+            ) {
                 Surface(
                     color = MaterialTheme.colors.secondary,
                     shape = CircleShape,

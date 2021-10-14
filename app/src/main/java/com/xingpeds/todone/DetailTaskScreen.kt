@@ -30,7 +30,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.xingpeds.todone.rate.maintianRange
+import com.xingpeds.todone.rate.Immature
+import com.xingpeds.todone.rate.rateLastWindow
+import com.xingpeds.todone.textGraph.TextGraph
+import com.xingpeds.todone.textGraph.TextLine
 import java.lang.NumberFormatException
 import java.util.*
 import kotlin.time.ExperimentalTime
@@ -110,10 +113,21 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId:
                 }
             )
             Divider(modifier = Modifier.padding(10.dp))
+            if (task.rateLastWindow() !is Immature && task.regularity > 0) {
+                TextLine { length ->
+                    TextGraph(
+                        length = length,
+                        current = task.avgLastWindow,
+                        avg = task.avgUnitPerWindow,
+                        stdDev = task.stdDev
+                    )
+                }
+                Divider(modifier = Modifier.padding(10.dp))
+            }
+
             Text("completed ${task.numOfCompsLastWindow} times in last ${task.daysWindow} days")
             Text("total of ${task.unitsInLastWindow} ${task.unit} in last ${task.daysWindow} days")
-            Text("standard deviation ${task.stdDev}")
-            Text("maintanence range ${task.maintianRange}")
+            Text("Regularity ${task.regularity}%")
             Divider(modifier = Modifier.padding(10.dp))
             // List of completions takes too much room either move editing some where else or more
             // completions somewhere else
