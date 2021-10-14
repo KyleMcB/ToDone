@@ -5,7 +5,7 @@
 
 package com.xingpeds.todoneproto
 
-import com.xingpeds.todone.CompJson
+import com.xingpeds.todone.data.CompJson
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock

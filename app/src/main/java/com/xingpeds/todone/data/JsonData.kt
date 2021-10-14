@@ -3,7 +3,7 @@
  * All rights reserved
  */
 
-package com.xingpeds.todone
+package com.xingpeds.todone.data
 
 import java.util.*
 import kotlin.math.sqrt

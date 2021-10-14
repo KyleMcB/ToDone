@@ -17,6 +17,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.android.material.R
+import com.xingpeds.todone.data.Completion
+import com.xingpeds.todone.data.PersistJsonSource
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime

@@ -5,10 +5,10 @@
 
 package com.xingpeds.todoneproto
 
-import com.xingpeds.todone.CompJson
-import com.xingpeds.todone.Description
-import com.xingpeds.todone.SourceJson
-import com.xingpeds.todone.TaskJson
+import com.xingpeds.todone.data.CompJson
+import com.xingpeds.todone.data.Description
+import com.xingpeds.todone.data.SourceJson
+import com.xingpeds.todone.data.TaskJson
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
