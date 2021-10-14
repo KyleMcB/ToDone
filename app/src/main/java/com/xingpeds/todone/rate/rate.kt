@@ -5,7 +5,7 @@
 
 package com.xingpeds.todone.rate
 
-import com.xingpeds.todone.Task
+import com.xingpeds.todone.data.Task
 import kotlin.math.absoluteValue
 
 sealed class TaskRate {

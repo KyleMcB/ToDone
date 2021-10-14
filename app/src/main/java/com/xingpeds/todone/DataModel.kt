@@ -11,10 +11,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.xingpeds.todone.data.*
 import com.xingpeds.todone.rate.rateLastWindow
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.launch
 

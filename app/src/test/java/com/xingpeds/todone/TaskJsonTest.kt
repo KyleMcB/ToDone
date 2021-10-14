@@ -5,14 +5,14 @@
 
 package com.xingpeds.todoneproto
 
-import com.xingpeds.todone.CompJson
-import com.xingpeds.todone.Description
-import com.xingpeds.todone.TaskJson
+import com.xingpeds.todone.data.CompJson
+import com.xingpeds.todone.data.Description
+import com.xingpeds.todone.data.TaskJson
 import com.xingpeds.todone.rate.Accelerating
 import com.xingpeds.todone.rate.Declining
 import com.xingpeds.todone.rate.Maintaining
 import com.xingpeds.todone.rate.rateLastWindow
-import java.util.UUID
+import java.util.*
 import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -20,7 +20,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 @ExperimentalTime

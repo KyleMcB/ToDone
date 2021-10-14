@@ -25,8 +25,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.xingpeds.todone.rate.*
-import java.lang.NumberFormatException
+import com.xingpeds.todone.data.Description
+import com.xingpeds.todone.data.Task
+import com.xingpeds.todone.rate.rateLastWindow
 import kotlin.time.ExperimentalTime
 
 const val mainScreenRoute = "mainScreenRoute"
