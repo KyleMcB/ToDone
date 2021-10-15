@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Task
 import com.xingpeds.todone.screens.CompDetailScreen
+import com.xingpeds.todone.screens.compdetailscreenroute
 import com.xingpeds.todone.ui.theme.ToDoneTheme
 import java.util.*
 import kotlin.time.ExperimentalTime
@@ -71,7 +72,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    composable("/compdetailscreenroute/{taskId}") { navBackStackEntry ->
+                    composable(compdetailscreenroute) { navBackStackEntry ->
                         navBackStackEntry.arguments?.getString("taskId")?.let {
                             val id = it.toUUID()
                             val task = model.list.find { task -> task.id == id }
