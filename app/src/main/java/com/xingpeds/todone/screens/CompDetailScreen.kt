@@ -13,14 +13,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.xingpeds.todone.DataModel
 import com.xingpeds.todone.DrawerContent
 import com.xingpeds.todone.data.Task
@@ -37,6 +41,7 @@ const val compdetailscreenroute = "$compdetailpartial$tag"
 @Composable
 fun CompDetailScreen(dataModel: DataModel, navController: NavHostController, task: Task) {
     Scaffold(
+        floatingActionButton = { CreateNewCompFAB() },
         topBar = {
             TopAppBar(
                 title = { Text("History: ${task.name}") },
@@ -75,10 +80,34 @@ fun CompDetailScreen(dataModel: DataModel, navController: NavHostController, tas
                             shape = CircleShape,
                             color = MaterialTheme.colors.error,
                             modifier = Modifier.fillParentMaxSize()
-                        ) { Icon(Icons.Default.Clear, null, tint = MaterialTheme.colors.onError) }
+                        ) {
+                            Icon(
+                                Icons.Default.DeleteForever,
+                                null,
+                                tint = MaterialTheme.colors.onError
+                            )
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CreateNewCompFAB() {
+    val dialogState = rememberMaterialDialogState()
+    FloatingActionButton(onClick = { dialogState.show() }) { Icon(Icons.Default.Add, null) }
+
+    MaterialDialog(
+        dialogState = dialogState,
+        buttons = {
+            positiveButton("Ok")
+            negativeButton("Cancel")
+        }
+    ) {
+        datepicker { date ->
+            // TODO create completion with selected date
         }
     }
 }
