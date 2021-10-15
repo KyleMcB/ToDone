@@ -60,12 +60,16 @@ class MainActivity : ComponentActivity() {
                     composable(statsListScreenRoute) {
                         StatsList(dataModel = model, navController = navController)
                     }
-                    composable("/task/{taskId}") {
-                        DetailTaskScreen(
-                            dataModel = model,
-                            navController = navController,
-                            it.arguments?.getString("taskId").toUUID()
-                        )
+                    composable("/task/{taskId}") { navBackStack ->
+                        navBackStack.arguments?.getString("taskId")?.toUUID()?.let { id ->
+                            model.list.find { task -> task.id == id }?.let { task ->
+                                DetailTaskScreen(
+                                    dataModel = model,
+                                    navController = navController,
+                                    task
+                                )
+                            }
+                        }
                     }
                     composable("/compdetailscreenroute/{taskId}") { navBackStackEntry ->
                         navBackStackEntry.arguments?.getString("taskId")?.let {
@@ -103,10 +107,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private fun String?.toUUID(): UUID {
-    return if (this != null) {
-        UUID.fromString(this)
-    } else UUID.randomUUID()
+private fun String.toUUID(): UUID {
+    return UUID.fromString(this)
 }
 
 @Composable

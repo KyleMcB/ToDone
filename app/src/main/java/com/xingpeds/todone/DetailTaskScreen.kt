@@ -5,7 +5,6 @@
 
 package com.xingpeds.todone
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -30,23 +29,14 @@ import com.xingpeds.todone.rate.Immature
 import com.xingpeds.todone.rate.rateLastWindow
 import com.xingpeds.todone.textGraph.TextGraph
 import com.xingpeds.todone.textGraph.TextLine
-import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
-import kotlinx.datetime.TimeZone
 
 @ExperimentalTime
 @ExperimentalMaterialApi
 @Composable
-fun DetailTaskScreen(dataModel: DataModel, navController: NavController, taskId: UUID) {
-    val temp = dataModel.list.find { task -> task.id == taskId }
-    if (temp == null) {
-        Log.d("ugh", "how did I get here?")
-        //        navController.popBackStack(mainScreenRoute, true)
-        return
-    }
-    requireNotNull(temp)
-    val task: Task = temp
+fun DetailTaskScreen(dataModel: DataModel, navController: NavController, task: Task) {
+
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         scaffoldState = scaffoldState,
