@@ -9,10 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -20,10 +17,10 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
 @Composable
-fun AppBarNavigation(scaffoldState: ScaffoldState) {
+fun AppBarNavigation(scaffoldState: ScaffoldState, title: String = "ToDone") {
     val scope = rememberCoroutineScope()
     TopAppBar(
-        title = { Text("ToDone") },
+        title = { Text(title) },
         navigationIcon = {
             IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
                 Icon(Icons.Filled.Menu, contentDescription = null)
@@ -51,6 +48,13 @@ fun ColumnScope.DrawerContent(navController: NavController) {
                 navController.navigate(statsListScreenRoute) { popUpTo(mainScreenRoute) }
             }
     ) { Text("Stats") }
+    ListItem(
+        icon = { Icon(Icons.Default.History, "History") },
+        modifier =
+            Modifier.clickable {
+                navController.navigate(compListScreenRoute) { popUpTo(mainScreenRoute) }
+            }
+    ) { Text("History") }
     ListItem(
         icon = { Icon(Icons.Default.AccountBox, "storage settings") },
         modifier =
