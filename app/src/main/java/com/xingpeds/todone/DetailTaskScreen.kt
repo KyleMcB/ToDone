@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.xingpeds.todone.composables.NumberOutlinedTextField
 import com.xingpeds.todone.data.*
 import com.xingpeds.todone.rate.Immature
 import com.xingpeds.todone.rate.rateLastWindow
@@ -153,37 +153,6 @@ fun DetailTaskDaysWindow(daysWindow: Int, onChange: (Int) -> Unit) {
             }
         }
     }
-}
-
-@Composable
-private fun NumberOutlinedTextField(
-    number: Int,
-    enable: Boolean,
-    onChange: (Int) -> Unit,
-    label: String? = null
-) {
-    var value by remember { mutableStateOf(number.toString()) }
-    var valid by remember { mutableStateOf(true) }
-    OutlinedTextField(
-        value = value.toString(),
-        onValueChange = {
-            value = it
-            try {
-                val temp: Int = it.toInt()
-                onChange(temp)
-                valid = true
-            } catch (e: NumberFormatException) {
-                valid = false
-            }
-        },
-        isError = !valid,
-        label = { if (label != null) Text(label) },
-        singleLine = true,
-        maxLines = 1,
-        keyboardOptions =
-            KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-        enabled = enable
-    )
 }
 
 @Composable

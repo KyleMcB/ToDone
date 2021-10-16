@@ -13,7 +13,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -77,10 +77,16 @@ class MainActivity : ComponentActivity() {
                             val id = it.toUUID()
                             val task = model.list.find { task -> task.id == id }
                             task?.let {
+                                var mtask by remember { mutableStateOf(it, neverEqualPolicy()) }
                                 CompDetailScreen(
                                     dataModel = model,
                                     navController = navController,
-                                    task = task
+                                    task = mtask,
+                                    onCompletion = { comp ->
+                                        mtask.add(comp)
+                                        mtask = mtask
+                                        model.save()
+                                    }
                                 )
                             }
                         }

@@ -16,7 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -27,11 +27,13 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.xingpeds.todone.DataModel
 import com.xingpeds.todone.DrawerContent
+import com.xingpeds.todone.composables.NumberOutlinedTextField
+import com.xingpeds.todone.data.CompJson
+import com.xingpeds.todone.data.Completion
+import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.Task
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration
+import kotlinx.datetime.*
 
 private const val tag = "{taskId}"
 const val compdetailpartial = "/compdetailscreenroute/"
@@ -39,9 +41,14 @@ const val compdetailscreenroute = "$compdetailpartial$tag"
 
 @ExperimentalMaterialApi
 @Composable
-fun CompDetailScreen(dataModel: DataModel, navController: NavHostController, task: Task) {
+fun CompDetailScreen(
+    dataModel: DataModel,
+    navController: NavHostController,
+    task: Task,
+    onCompletion: (Completion) -> Unit
+) {
     Scaffold(
-        floatingActionButton = { CreateNewCompFAB() },
+        floatingActionButton = { CreateNewCompFAB(task, onCompletion) },
         topBar = {
             TopAppBar(
                 title = { Text("History: ${task.name}") },
@@ -95,19 +102,57 @@ fun CompDetailScreen(dataModel: DataModel, navController: NavHostController, tas
 }
 
 @Composable
-fun CreateNewCompFAB() {
+fun CreateNewCompFAB(task: Task, onCompletion: (Completion) -> Unit) {
     val dialogState = rememberMaterialDialogState()
     FloatingActionButton(onClick = { dialogState.show() }) { Icon(Icons.Default.Add, null) }
-
+    var description by remember { mutableStateOf<String?>(null) }
+    var amount by remember { mutableStateOf<Int?>(null) }
+    var timeStamp by remember { mutableStateOf(Clock.System.now()) }
+    fun reset() {
+        description = null
+        amount = null
+        timeStamp = Clock.System.now()
+    }
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton("Ok")
-            negativeButton("Cancel")
+            positiveButton(
+                "Ok",
+                onClick = {
+                    amount?.let {
+                        onCompletion(
+                            CompJson(
+                                it,
+                                timeStamp = timeStamp,
+                                desc = Description(text = description)
+                            )
+                        )
+                    }
+                    reset()
+                }
+            )
+            negativeButton("Cancel", onClick = { reset() })
         }
     ) {
+        OutlinedTextField(
+            value = description ?: "",
+            onValueChange = { description = it },
+            label = { Text("Desciption") },
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp).fillMaxWidth()
+        )
+        NumberOutlinedTextField(
+            number = amount,
+            enable = true,
+            onChange = { amount = it },
+            label = "Amount",
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp).fillMaxWidth()
+        )
         datepicker { date ->
-            // TODO create completion with selected date
+            var temp = date.toKotlinLocalDate().atStartOfDayIn(TimeZone.currentSystemDefault())
+            while (task.filter { comp -> comp.timeStamp == temp }.isNotEmpty()) {
+                temp += Duration.Companion.seconds(1)
+            }
+            timeStamp = temp
         }
     }
 }
