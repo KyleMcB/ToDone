@@ -53,8 +53,11 @@ data class TaskJson(
 ) : Task {
 
     // this probably isn't going to serialize properly. need to do private constructor trick
-    private val comps: MutableSet<CompJson> = mutableSetOf()
-
+    private val comps: MutableList<CompJson> = mutableListOf()
+    //    private val comps: MutableList<CompJson> = mutableListOf()
+    init {
+        comps.sort()
+    }
     override fun createCompletion(units: Int, description: Description): Completion {
         val comp = CompJson(units, desc = description)
         comps.add(comp)
@@ -74,31 +77,14 @@ data class TaskJson(
 
     override val numOfCompsLastWindow: Int
         get() = this.compsLastWindow.size
-    val compsLast7days: List<Completion>
-        get() =
-            this.filter {
-                it.timeStamp in Clock.System.now() - Duration.days(7)..Clock.System.now()
-            }
+
     override val daysSinceCreated: Long
         get() {
             if (isEmpty()) return 0
             val list = this.sortedBy { it.timeStamp }
             return (Clock.System.now() - list.first().timeStamp).inWholeDays
         }
-    val weeksSinceCreated: Long
-        get() {
-            return daysSinceCreated / 7
-        }
-    val _30DaysSinceCreate: Long
-        get() {
-            return daysSinceCreated / 30
-        }
 
-    val compsLast30days: List<Completion>
-        get() =
-            this.filter {
-                it.timeStamp in Clock.System.now() - Duration.days(30)..Clock.System.now()
-            }
     val compsLastWindow: List<Completion>
         get() =
             this.filter {
@@ -155,10 +141,20 @@ data class TaskJson(
         return comps.isEmpty()
     }
 
-    override fun add(element: Completion) =
-        comps.add(CompJson(element.units, desc = element.desc, timeStamp = element.timeStamp))
-    override fun addAll(elements: Collection<Completion>) =
-        comps.addAll(elements.map { CompJson(it.units, desc = it.desc, timeStamp = it.timeStamp) })
+    override fun add(element: Completion): Boolean {
+        val result =
+            comps.add(CompJson(element.units, desc = element.desc, timeStamp = element.timeStamp))
+        comps.sort() // TODO super inefficient. I need to upgrade to a DB
+        return result
+    }
+    override fun addAll(elements: Collection<Completion>): Boolean {
+        val result =
+            comps.addAll(
+                elements.map { CompJson(it.units, desc = it.desc, timeStamp = it.timeStamp) }
+            )
+        comps.sort() // TODO super inefficient. I need to upgrade to a DB
+        return result
+    }
 
     override fun clear() = comps.clear()
 

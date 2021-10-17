@@ -24,11 +24,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.xingpeds.todone.composables.NumberOutlinedTextField
-import com.xingpeds.todone.data.*
+import com.xingpeds.todone.data.Completion
+import com.xingpeds.todone.data.Description
+import com.xingpeds.todone.data.Task
+import com.xingpeds.todone.data.regularity
 import com.xingpeds.todone.rate.Immature
 import com.xingpeds.todone.rate.rateLastWindow
 import com.xingpeds.todone.textGraph.TextGraph
 import com.xingpeds.todone.textGraph.TextLine
+import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
 
@@ -102,7 +106,7 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, task: T
                 TextLine { length ->
                     TextGraph(
                         length = length,
-                        current = task.avgLastWindow,
+                        current = task.unitsInLastWindow.toFloat(),
                         avg = task.avgUnitPerWindow,
                         stdDev = task.stdDev
                     )
@@ -112,7 +116,7 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, task: T
 
             Text("completed ${task.numOfCompsLastWindow} times in last ${task.daysWindow} days")
             Text("total of ${task.unitsInLastWindow} ${task.unit} in last ${task.daysWindow} days")
-            Text("Regularity ${task.regularity}%")
+            Text("Regularity ${task.regularity.roundToInt()}%")
             Divider(modifier = Modifier.padding(10.dp))
             // List of completions takes too much room either move editing some where else or more
             // completions somewhere else
