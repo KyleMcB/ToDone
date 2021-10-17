@@ -29,7 +29,7 @@ internal class TaskJsonTest {
     val taskNoComps: TaskJson =
         TaskJson("test", Description("task descr"), "minutes", 30, UUID.randomUUID())
     val completion1 = CompJson(30)
-    val completion2 = CompJson(45)
+    val completion2 = CompJson(45, timeStamp = Clock.System.now() - Duration.days(1))
     val taskOneComp: TaskJson =
         TaskJson("name1", Description(), "minutes", 30).apply { add(completion1) }
     val taskTwocomp: TaskJson =
@@ -108,7 +108,8 @@ internal class TaskJsonTest {
     @Test
     fun retainAll() {
         assert(taskTwocomp.retainAll(listOf(completion2)))
-        assert(taskTwocomp.size == 1)
+        val size = taskTwocomp.size
+        assert(size == 1)
         assert(taskTwocomp.first() == completion2)
     }
     @Test
@@ -182,7 +183,7 @@ internal class TaskJsonTest {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         assertEquals(0, task.unitsInLastWindow)
         task.add(CompJson(30))
-        task.add(CompJson(50))
+        task.add(CompJson(50, Clock.System.now() - Duration.days(1)))
         task.add(CompJson(50, Clock.System.now() - Duration.days(31)))
         assertEquals(30 + 50, task.unitsInLastWindow)
     }

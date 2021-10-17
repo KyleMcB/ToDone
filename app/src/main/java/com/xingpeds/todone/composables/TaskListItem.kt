@@ -28,7 +28,6 @@ fun TaskListItem(
     modifier: Modifier = Modifier,
     secondary: @Composable () -> Unit = { LastCompDescription(task = task) },
 ) {
-
     ListItemLayout(
         modifier = Modifier.shadow(elevation = 3.dp, shape = RoundedCornerShape(20)).then(modifier),
         text = { Text(text = task.name) },

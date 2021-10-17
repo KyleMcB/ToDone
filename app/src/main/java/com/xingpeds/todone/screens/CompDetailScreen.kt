@@ -45,7 +45,8 @@ fun CompDetailScreen(
     dataModel: DataModel,
     navController: NavHostController,
     task: Task,
-    onCompletion: (Completion) -> Unit
+    onCompletion: (Completion) -> Unit,
+    onDelete: (Completion) -> Unit
 ) {
     Scaffold(
         floatingActionButton = { CreateNewCompFAB(task, onCompletion) },
@@ -82,7 +83,7 @@ fun CompDetailScreen(
                     }
                     Box(modifier = Modifier.padding(15.dp).size(40.dp)) {
                         Surface(
-                            onClick = { /* TODO delete completion */},
+                            onClick = { onDelete(comp) },
                             elevation = 10.dp,
                             shape = CircleShape,
                             color = MaterialTheme.colors.error,

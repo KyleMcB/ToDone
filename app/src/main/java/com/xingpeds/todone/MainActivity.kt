@@ -86,6 +86,11 @@ class MainActivity : ComponentActivity() {
                                         mtask.add(comp)
                                         mtask = mtask
                                         model.save()
+                                    },
+                                    onDelete = { comp ->
+                                        mtask.remove(comp)
+                                        mtask = mtask
+                                        model.save()
                                     }
                                 )
                             }
