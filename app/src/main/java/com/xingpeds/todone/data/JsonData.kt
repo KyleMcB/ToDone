@@ -10,7 +10,6 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -19,12 +18,12 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-@Serializable
-data class CompJson(
-    override val units: Int,
-    override val timeStamp: Instant = Clock.System.now(),
-    override val desc: Description = Description()
-) : Completion
+// @Serializable
+// data class CompJson(
+//    override val units: Int,
+//    override val timeStamp: Instant = Clock.System.now(),
+//    override val desc: Description = Description()
+// ) : Completion
 
 class UUIDSerializer : KSerializer<UUID> {
     override fun deserialize(decoder: Decoder): UUID {
@@ -53,13 +52,13 @@ data class TaskJson(
 ) : Task {
 
     // this probably isn't going to serialize properly. need to do private constructor trick
-    private val comps: MutableList<CompJson> = mutableListOf()
+    private val comps: MutableList<Completion> = mutableListOf()
     //    private val comps: MutableList<CompJson> = mutableListOf()
     init {
         comps.sort()
     }
     override fun createCompletion(units: Int, description: Description): Completion {
-        val comp = CompJson(units, desc = description)
+        val comp = Completion(units, desc = description)
         comps.add(comp)
         return comp
     }
@@ -143,14 +142,14 @@ data class TaskJson(
 
     override fun add(element: Completion): Boolean {
         val result =
-            comps.add(CompJson(element.units, desc = element.desc, timeStamp = element.timeStamp))
+            comps.add(Completion(element.units, desc = element.desc, timeStamp = element.timeStamp))
         comps.sort() // TODO super inefficient. I need to upgrade to a DB
         return result
     }
     override fun addAll(elements: Collection<Completion>): Boolean {
         val result =
             comps.addAll(
-                elements.map { CompJson(it.units, desc = it.desc, timeStamp = it.timeStamp) }
+                elements.map { Completion(it.units, desc = it.desc, timeStamp = it.timeStamp) }
             )
         comps.sort() // TODO super inefficient. I need to upgrade to a DB
         return result
@@ -165,10 +164,6 @@ data class TaskJson(
     override fun removeAll(elements: Collection<Completion>) = comps.removeAll(elements)
 
     override fun retainAll(elements: Collection<Completion>) = comps.retainAll(elements)
-}
-
-fun Completion.toCompJson(): CompJson {
-    return CompJson(units, timeStamp, desc)
 }
 
 @ExperimentalTime

@@ -5,7 +5,7 @@
 
 package com.xingpeds.todoneproto
 
-import com.xingpeds.todone.data.CompJson
+import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.SourceJson
 import com.xingpeds.todone.data.TaskJson
@@ -84,7 +84,7 @@ internal class SourceJsonTest {
                 )
                 .apply {
                     add(
-                        CompJson(
+                        Completion(
                             9,
                             Clock.System.now() - Duration.days(1),
                             Description("ride to work")

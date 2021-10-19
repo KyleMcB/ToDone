@@ -6,19 +6,21 @@
 package com.xingpeds.todone.data
 
 import java.util.*
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable data class Description(var text: String? = null, var picture: String? = null)
 
-sealed interface Completion : Comparable<Completion> {
-    val units: Int
-    val timeStamp: Instant
+@Serializable
+data class Completion(
+    val units: Int,
+    val timeStamp: Instant = Clock.System.now(),
+    val desc: Description = Description()
+) : Comparable<Completion> {
     override fun compareTo(other: Completion): Int {
         return timeStamp.compareTo(other.timeStamp)
     }
-
-    val desc: Description
 }
 
 const val defaultWindowSize = 7
