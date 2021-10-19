@@ -68,18 +68,20 @@ fun CompDetailScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(10.dp)
+                        Modifier.padding(10.dp)
+                            .fillMaxWidth()
+                            .wrapContentHeight()
                             .shadow(elevation = 3.dp, shape = RoundedCornerShape(20))
                 ) {
-                    Column {
+                    Column(Modifier.wrapContentSize().padding(10.dp)) {
                         Text(
                             comp.timeStamp.toReadable(),
-                            modifier = Modifier.padding(top = 10.dp, start = 10.dp)
                         )
-                        val text = comp.desc.text ?: "No Description"
 
-                        Text(text, modifier = Modifier.padding(start = 20.dp, bottom = 10.dp))
+                        Text("Amount: ${comp.units}")
+                        Text(
+                            comp.desc.text ?: "No Description",
+                        )
                     }
                     Box(modifier = Modifier.padding(15.dp).size(40.dp)) {
                         Surface(
