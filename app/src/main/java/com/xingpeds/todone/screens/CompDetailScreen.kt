@@ -8,6 +8,7 @@ package com.xingpeds.todone.screens
 // import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +29,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.xingpeds.todone.DataModel
 import com.xingpeds.todone.DrawerContent
 import com.xingpeds.todone.composables.NumberOutlinedTextField
-import com.xingpeds.todone.data.CompJson
 import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.Task
@@ -124,7 +124,7 @@ fun CreateNewCompFAB(task: Task, onCompletion: (Completion) -> Unit) {
                 onClick = {
                     amount?.let {
                         onCompletion(
-                            CompJson(
+                            Completion(
                                 it,
                                 timeStamp = timeStamp,
                                 desc = Description(text = description)
