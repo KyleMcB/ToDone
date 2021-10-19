@@ -5,7 +5,7 @@
 
 package com.xingpeds.todoneproto
 
-import com.xingpeds.todone.data.CompJson
+import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.TaskJson
 import com.xingpeds.todone.rate.Accelerating
@@ -28,8 +28,8 @@ internal class TaskJsonTest {
 
     val taskNoComps: TaskJson =
         TaskJson("test", Description("task descr"), "minutes", 30, UUID.randomUUID())
-    val completion1 = CompJson(30)
-    val completion2 = CompJson(45, timeStamp = Clock.System.now() - Duration.days(1))
+    val completion1 = Completion(30)
+    val completion2 = Completion(45, timeStamp = Clock.System.now() - Duration.days(1))
     val taskOneComp: TaskJson =
         TaskJson("name1", Description(), "minutes", 30).apply { add(completion1) }
     val taskTwocomp: TaskJson =
@@ -137,7 +137,7 @@ internal class TaskJsonTest {
     fun avgCompsPerWeeks() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         assertEquals("task with no completions has average of zero", 0f, task.avgCompPerWindow)
-        val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
+        val comp1: Completion = Completion(1, Clock.System.now() - Duration.days(9))
         task.add(comp1)
         assertEquals(7f / 9f, task.avgCompPerWindow)
     }
@@ -146,7 +146,7 @@ internal class TaskJsonTest {
     fun avgCompsPer30days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         assertEquals(0f, task.avgCompPerWindow)
-        val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
+        val comp1: Completion = Completion(1, Clock.System.now() - Duration.days(9))
         task.add(comp1)
         assertEquals(30f / 9f, task.avgCompPerWindow)
     }
@@ -154,89 +154,89 @@ internal class TaskJsonTest {
     fun compsLast7Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         assertEquals(0, task.numOfCompsLastWindow)
-        val comp1: CompJson = CompJson(1, Clock.System.now() - Duration.days(9))
+        val comp1: Completion = Completion(1, Clock.System.now() - Duration.days(9))
         task.add(comp1)
         assertEquals(0, task.numOfCompsLastWindow)
-        task.add(CompJson(1, Clock.System.now() - Duration.days(2)))
+        task.add(Completion(1, Clock.System.now() - Duration.days(2)))
         assertEquals(1, task.numOfCompsLastWindow)
     }
     @Test
     fun compsLast30Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         assertEquals(0, task.numOfCompsLastWindow)
-        task.add(CompJson(1, Clock.System.now() - Duration.days(2)))
+        task.add(Completion(1, Clock.System.now() - Duration.days(2)))
         assertEquals(1, task.numOfCompsLastWindow)
-        task.add(CompJson(1, Clock.System.now() - Duration.days(31)))
+        task.add(Completion(1, Clock.System.now() - Duration.days(31)))
         assertEquals(1, task.numOfCompsLastWindow)
     }
     @Test
     fun unitsLast7Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         assertEquals(0, task.unitsInLastWindow)
-        task.add(CompJson(30))
+        task.add(Completion(30))
         assertEquals(30, task.unitsInLastWindow)
-        task.add(CompJson(30, Clock.System.now() - Duration.days(9)))
+        task.add(Completion(30, Clock.System.now() - Duration.days(9)))
         assertEquals(30, task.unitsInLastWindow)
     }
     @Test
     fun unitsLast30Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         assertEquals(0, task.unitsInLastWindow)
-        task.add(CompJson(30))
-        task.add(CompJson(50, Clock.System.now() - Duration.days(1)))
-        task.add(CompJson(50, Clock.System.now() - Duration.days(31)))
+        task.add(Completion(30))
+        task.add(Completion(50, Clock.System.now() - Duration.days(1)))
+        task.add(Completion(50, Clock.System.now() - Duration.days(31)))
         assertEquals(30 + 50, task.unitsInLastWindow)
     }
     @Test
     fun unitsPerWeek() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         assertEquals(0, task.unitsPerWindow.size)
-        task.add(CompJson(30))
+        task.add(Completion(30))
         assertEquals(1, task.unitsPerWindow.size)
-        task.add(CompJson(30, Clock.System.now() - Duration.days(task.daysWindow + 1)))
+        task.add(Completion(30, Clock.System.now() - Duration.days(task.daysWindow + 1)))
         assertEquals(2, task.unitsPerWindow.size)
     }
     @Test
     fun stdDevWeek() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        task.add(CompJson(13))
-        task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
-        task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
+        task.add(Completion(13))
+        task.add(Completion(15, Clock.System.now() - Duration.days(8)))
+        task.add(Completion(19, Clock.System.now() - Duration.days(15)))
         assertEquals(2f * sqrt(7f / 3f), task.stdDev)
     }
     @Test
     fun unitsPer30days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
         assertEquals(0, task.unitsPerWindow.size)
-        task.add(CompJson(30))
+        task.add(Completion(30))
         assertEquals(1, task.unitsPerWindow.size)
-        task.add(CompJson(30, Clock.System.now() - Duration.days(7)))
+        task.add(Completion(30, Clock.System.now() - Duration.days(7)))
         assertEquals(1, task.unitsPerWindow.size)
-        task.add(CompJson(30, Clock.System.now() - Duration.days(32)))
+        task.add(Completion(30, Clock.System.now() - Duration.days(32)))
         assertEquals(2, task.unitsPerWindow.size)
     }
     @Test
     fun stdDev30Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
-        task.add(CompJson(13))
-        task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
-        task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
+        task.add(Completion(13))
+        task.add(Completion(15, Clock.System.now() - Duration.days(31)))
+        task.add(Completion(19, Clock.System.now() - Duration.days(61)))
         assertEquals(2f * sqrt(7f / 3f), task.stdDev)
     }
     @Test
     fun avgUnitPerWeek() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
-        task.add(CompJson(13))
-        task.add(CompJson(15, Clock.System.now() - Duration.days(8)))
-        task.add(CompJson(19, Clock.System.now() - Duration.days(15)))
+        task.add(Completion(13))
+        task.add(Completion(15, Clock.System.now() - Duration.days(8)))
+        task.add(Completion(19, Clock.System.now() - Duration.days(15)))
         assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPerWindow)
     }
     @Test
     fun avgUnits30Days() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10, daysWindow = 30)
-        task.add(CompJson(13))
-        task.add(CompJson(15, Clock.System.now() - Duration.days(31)))
-        task.add(CompJson(19, Clock.System.now() - Duration.days(61)))
+        task.add(Completion(13))
+        task.add(Completion(15, Clock.System.now() - Duration.days(31)))
+        task.add(Completion(19, Clock.System.now() - Duration.days(61)))
         assertEquals((13f + 15f + 19f) / 3f, task.avgUnitPerWindow)
     }
     @Test
@@ -244,10 +244,10 @@ internal class TaskJsonTest {
         // test of decline
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         with(task) {
-            add(CompJson(100, Clock.System.now() - Duration.days(8)))
-            add(CompJson(120, Clock.System.now() - Duration.days(15)))
-            add(CompJson(80, Clock.System.now() - Duration.days(22)))
-            add(CompJson(50))
+            add(Completion(100, Clock.System.now() - Duration.days(8)))
+            add(Completion(120, Clock.System.now() - Duration.days(15)))
+            add(Completion(80, Clock.System.now() - Duration.days(22)))
+            add(Completion(50))
         }
         assert(task.rateLastWindow() is Declining)
     }
@@ -255,10 +255,10 @@ internal class TaskJsonTest {
     fun rate7DayOfMaintain() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         with(task) {
-            add(CompJson(100, Clock.System.now() - Duration.days(8)))
-            add(CompJson(120, Clock.System.now() - Duration.days(15)))
-            add(CompJson(80, Clock.System.now() - Duration.days(22)))
-            add(CompJson(100))
+            add(Completion(100, Clock.System.now() - Duration.days(8)))
+            add(Completion(120, Clock.System.now() - Duration.days(15)))
+            add(Completion(80, Clock.System.now() - Duration.days(22)))
+            add(Completion(100))
         }
         assert(task.rateLastWindow() is Maintaining)
     }
@@ -266,10 +266,10 @@ internal class TaskJsonTest {
     fun rate7DaysOfAccel() {
         val task: TaskJson = TaskJson("task1n", Description("desc"), "minutes", 10)
         with(task) {
-            add(CompJson(100, Clock.System.now() - Duration.days(8)))
-            add(CompJson(120, Clock.System.now() - Duration.days(15)))
-            add(CompJson(80, Clock.System.now() - Duration.days(22)))
-            add(CompJson(130))
+            add(Completion(100, Clock.System.now() - Duration.days(8)))
+            add(Completion(120, Clock.System.now() - Duration.days(15)))
+            add(Completion(80, Clock.System.now() - Duration.days(22)))
+            add(Completion(130))
         }
         assert(task.rateLastWindow() is Accelerating)
     }
