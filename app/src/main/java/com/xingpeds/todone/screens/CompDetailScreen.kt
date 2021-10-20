@@ -16,7 +16,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,13 +33,15 @@ import com.xingpeds.todone.composables.NumberOutlinedTextField
 import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.Task
+import com.xingpeds.todone.instant.toReadableDate
+import com.xingpeds.todone.instant.toReadbleTime
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlinx.datetime.*
 
-private const val tag = "{taskId}"
+const val tagTaskId = "{taskId}"
 const val compdetailpartial = "/compdetailscreenroute/"
-const val compdetailscreenroute = "$compdetailpartial$tag"
+const val compdetailscreenroute = "$compdetailpartial$tagTaskId"
 
 @ExperimentalMaterialApi
 @Composable
@@ -138,20 +139,6 @@ fun LazyItemScope.CompListItem(comp: Completion, units: String, onDelete: (Compl
             }
         }
     }
-}
-
-private fun Instant.toReadableDate(): String {
-    val dateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
-    val date = dateTime.date
-    return date.toString()
-}
-
-private fun Instant.toReadbleTime(): String {
-    val dateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
-    val hour = dateTime.hour
-    val minute = dateTime.minute
-    val minuteString = if (minute < 10) "0$minute" else minute.toString()
-    return "$hour:$minuteString"
 }
 
 @ExperimentalMaterialApi
