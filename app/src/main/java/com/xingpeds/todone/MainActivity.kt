@@ -19,14 +19,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Task
-import com.xingpeds.todone.screens.CompDetailScreen
-import com.xingpeds.todone.screens.compdetailscreenroute
+import com.xingpeds.todone.screens.*
 import com.xingpeds.todone.ui.theme.ToDoneTheme
 import java.util.*
 import kotlin.time.ExperimentalTime
-import kotlinx.datetime.Clock
+import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.periodUntil
 
 @ExperimentalTime
 class MainActivity : ComponentActivity() {
@@ -57,6 +55,28 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             ToDoneTheme {
                 NavHost(navController = navController, startDestination = mainScreenRoute) {
+                    composable(compdetaileditscreenroute) { nav ->
+                        nav.arguments?.getString(tagTaskId)?.let { idString ->
+                            val task = model.list.find { it.id == UUID.fromString(idString) }
+                            nav.arguments?.getString(compIdtag)?.let { instantString ->
+                                val timeStamp = Instant.parse(instantString)
+                                val comp = task?.find { it.timeStamp == timeStamp }
+                                if (comp == null) {} else {
+
+                                    CompDetailEditScreen(
+                                        dataModel = model,
+                                        navController = navController,
+                                        comp = comp,
+                                        units = task.unit,
+                                        onTime = { time: LocalDateTime -> },
+                                        onDate = { date: LocalDateTime -> },
+                                        onDesc = { desc: String -> },
+                                        onUnits = { units: Int -> }
+                                    )
+                                }
+                            }
+                        }
+                    }
                     composable(mainScreenRoute) { TaskListScreen(model, navController) }
                     composable(statsListScreenRoute) {
                         StatsList(dataModel = model, navController = navController)
