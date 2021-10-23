@@ -23,6 +23,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.time.timepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.xingpeds.todone.DataModel
 import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Task
@@ -30,9 +34,7 @@ import com.xingpeds.todone.instant.toReadableDate
 import com.xingpeds.todone.instant.toReadbleTime
 import com.xingpeds.todone.logcat
 import java.lang.NumberFormatException
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 
 const val compdetaileditbaseroute = "/compdetaileditscreenroute/"
 const val compIdtag = "{compId}"
@@ -48,12 +50,19 @@ fun CompDetailEditScreen(
     navController: NavHostController,
     comp: Completion,
     units: String,
-    onTime: (LocalDateTime) -> Unit,
-    onDate: (LocalDateTime) -> Unit,
+    onTimeStamp: (LocalDateTime) -> Unit,
     onDesc: (String) -> Unit,
     onUnits: (Int) -> Unit
 ) {
-    Screen(comp.desc.text, comp.units, units, comp.timeStamp, onDesc = onDesc, onUnits = onUnits)
+    Screen(
+        comp.desc.text,
+        comp.units,
+        units,
+        comp.timeStamp,
+        onDesc = onDesc,
+        onUnits = onUnits,
+        onTimeStamp = onTimeStamp
+    )
 }
 
 @Composable
@@ -63,13 +72,77 @@ private fun Screen(
     unitType: String,
     timeStamp: Instant,
     onDesc: (String) -> Unit = {},
-    onUnits: (Int) -> Unit = {}
+    onUnits: (Int) -> Unit = {},
+    onTimeStamp: (LocalDateTime) -> Unit = {}
 ) {
     var unitString by remember { mutableStateOf(units.toString()) }
     var localUnits by remember { mutableStateOf(units) }
     var unitError: Boolean by remember { mutableStateOf(false) }
     var localDescription: String by remember { mutableStateOf(desc ?: "") }
     val focusManager = LocalFocusManager.current
+    val dateDialog = rememberMaterialDialogState()
+    MaterialDialog(
+        dialogState = dateDialog,
+        buttons = {
+            positiveButton("Ok")
+            negativeButton("Cancel")
+        }
+    ) {
+        datepicker(
+            initialDate =
+                timeStamp
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .toJavaLocalDateTime()
+                    .toLocalDate()
+        ) { date ->
+            val newDate = date.toKotlinLocalDate()
+            val oldDateTime = timeStamp.toLocalDateTime(TimeZone.currentSystemDefault())
+            val combinedDateTime =
+                LocalDateTime(
+                    year = newDate.year,
+                    monthNumber = newDate.monthNumber,
+                    dayOfMonth = newDate.dayOfMonth,
+                    hour = oldDateTime.hour,
+                    minute = oldDateTime.minute,
+                    second = oldDateTime.second,
+                    nanosecond = oldDateTime.nanosecond
+                )
+            onTimeStamp(combinedDateTime)
+        }
+    }
+
+    /* This should be called in an onClick or an Effect */
+    //    dateDialog.show()
+    val timeDialog = rememberMaterialDialogState()
+    MaterialDialog(
+        dialogState = timeDialog,
+        buttons = {
+            positiveButton("Ok")
+            negativeButton("Cancel")
+        }
+    ) {
+        timepicker(
+            initialTime =
+                timeStamp
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .toJavaLocalDateTime()
+                    .toLocalTime()
+        ) { newTime ->
+            val oldDate = timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
+            val newDateTime =
+                LocalDateTime(
+                    year = oldDate.year,
+                    monthNumber = oldDate.monthNumber,
+                    dayOfMonth = oldDate.dayOfMonth,
+                    hour = newTime.hour,
+                    minute = newTime.minute,
+                    second = newTime.second,
+                    nanosecond = newTime.nano
+                )
+            onTimeStamp(newDateTime)
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround,
@@ -111,17 +184,21 @@ private fun Screen(
 
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text("Date: ${timeStamp.toReadableDate()}")
-            FloatingActionButton(onClick = { /*TODO launch date picker*/}) {
-                Icon(Icons.Default.Event, null)
-            }
+            FloatingActionButton(
+                onClick = { /*TODO launch date picker*/
+                    dateDialog.show()
+                }
+            ) { Icon(Icons.Default.Event, null) }
         }
         Spacer(modifier = Modifier.padding(10.dp))
 
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text("Time: ${timeStamp.toReadbleTime()}")
-            FloatingActionButton(onClick = { /*TODO launch time picker*/}) {
-                Icon(Icons.Default.Schedule, contentDescription = null)
-            }
+            FloatingActionButton(
+                onClick = { /*TODO launch time picker*/
+                    timeDialog.show()
+                }
+            ) { Icon(Icons.Default.Schedule, contentDescription = null) }
         }
         Spacer(modifier = Modifier.padding(10.dp))
         FloatingActionButton(

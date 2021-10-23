@@ -71,24 +71,12 @@ class MainActivity : ComponentActivity() {
                                         navController = navController,
                                         comp = comp,
                                         units = task.unit,
-                                        onTime = { time: LocalDateTime ->
+                                        onTimeStamp = { time: LocalDateTime ->
                                             task.remove(comp)
                                             task.add(
                                                 comp.copy(
                                                     timeStamp =
                                                         time.toInstant(
-                                                            TimeZone.currentSystemDefault()
-                                                        )
-                                                )
-                                            )
-                                        },
-                                        onDate = { date: LocalDateTime ->
-                                            // not dry TODO move to viewmodel and refactor
-                                            task.remove(comp)
-                                            task.add(
-                                                comp.copy(
-                                                    timeStamp =
-                                                        date.toInstant(
                                                             TimeZone.currentSystemDefault()
                                                         )
                                                 )
