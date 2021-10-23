@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.xingpeds.todone.data.Completion
+import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.Task
 import com.xingpeds.todone.screens.*
 import com.xingpeds.todone.ui.theme.ToDoneTheme
@@ -56,22 +57,55 @@ class MainActivity : ComponentActivity() {
             ToDoneTheme {
                 NavHost(navController = navController, startDestination = mainScreenRoute) {
                     composable(compdetaileditscreenroute) { nav ->
-                        nav.arguments?.getString(tagTaskId)?.let { idString ->
+                        val taskId = nav.arguments?.getString("taskId")
+                        val compId = nav.arguments?.getString("compId")
+                        taskId?.let { idString ->
                             val task = model.list.find { it.id == UUID.fromString(idString) }
-                            nav.arguments?.getString(compIdtag)?.let { instantString ->
+                            requireNotNull(task)
+                            compId?.let { instantString ->
                                 val timeStamp = Instant.parse(instantString)
-                                val comp = task?.find { it.timeStamp == timeStamp }
+                                val comp = task.find { it.timeStamp == timeStamp }
                                 if (comp == null) {} else {
-
                                     CompDetailEditScreen(
                                         dataModel = model,
                                         navController = navController,
                                         comp = comp,
                                         units = task.unit,
-                                        onTime = { time: LocalDateTime -> },
-                                        onDate = { date: LocalDateTime -> },
-                                        onDesc = { desc: String -> },
-                                        onUnits = { units: Int -> }
+                                        onTime = { time: LocalDateTime ->
+                                            task.remove(comp)
+                                            task.add(
+                                                comp.copy(
+                                                    timeStamp =
+                                                        time.toInstant(
+                                                            TimeZone.currentSystemDefault()
+                                                        )
+                                                )
+                                            )
+                                        },
+                                        onDate = { date: LocalDateTime ->
+                                            // not dry TODO move to viewmodel and refactor
+                                            task.remove(comp)
+                                            task.add(
+                                                comp.copy(
+                                                    timeStamp =
+                                                        date.toInstant(
+                                                            TimeZone.currentSystemDefault()
+                                                        )
+                                                )
+                                            )
+                                        },
+                                        onDesc = { desc: String ->
+                                            val old = task.remove(comp)
+                                            task.add(
+                                                comp.copy(
+                                                    desc = Description(desc, comp.desc.picture)
+                                                )
+                                            )
+                                        },
+                                        onUnits = { units: Int ->
+                                            task.remove(comp)
+                                            task.add(comp.copy(units = units))
+                                        }
                                     )
                                 }
                             }
