@@ -68,7 +68,12 @@ fun CompDetailScreen(
     ) {
         LazyColumn() {
             items(task.toList().sortedDescending()) { comp ->
-                CompListItem(comp, task.unit, onDelete)
+                CompListItem(
+                    comp,
+                    task.unit,
+                    onDelete,
+                    { comp -> navController.navigate(addressOfCompEditDetialScreen(task, comp)) }
+                )
             }
         }
     }
@@ -76,7 +81,12 @@ fun CompDetailScreen(
 
 @ExperimentalMaterialApi
 @Composable
-fun LazyItemScope.CompListItem(comp: Completion, units: String, onDelete: (Completion) -> Unit) {
+fun LazyItemScope.CompListItem(
+    comp: Completion,
+    units: String,
+    onDelete: (Completion) -> Unit,
+    onEdit: (Completion) -> Unit
+) {
     Surface(
         modifier =
             Modifier.padding(10.dp)
@@ -118,7 +128,9 @@ fun LazyItemScope.CompListItem(comp: Completion, units: String, onDelete: (Compl
                 }
                 Box(modifier = Modifier.padding(15.dp).size(40.dp)) {
                     Surface(
-                        onClick = { /*TODO navigate to edit screen */},
+                        onClick = { /*TODO navigate to edit screen */
+                            onEdit(comp)
+                        },
                         elevation = 10.dp,
                         shape = CircleShape,
                         color = MaterialTheme.colors.secondary,
@@ -157,7 +169,8 @@ fun PreviewCompListItem() {
                             )
                     ),
                 units = "Minutes",
-                onDelete = {}
+                onDelete = {},
+                onEdit = {}
             )
         }
     }
@@ -167,7 +180,9 @@ fun PreviewCompListItem() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewCompListItemNoDesc() {
-    LazyColumn() { item { CompListItem(comp = Completion(1), units = "Minutes", onDelete = {}) } }
+    LazyColumn() {
+        item { CompListItem(comp = Completion(1), units = "Minutes", onDelete = {}, onEdit = {}) }
+    }
 }
 
 @Composable
