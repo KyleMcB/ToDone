@@ -141,18 +141,16 @@ data class TaskJson(
     }
 
     override fun add(element: Completion): Boolean {
+        if (contains(element = element)) return false
         val result =
             comps.add(Completion(element.units, desc = element.desc, timeStamp = element.timeStamp))
         comps.sort() // TODO super inefficient. I need to upgrade to a DB
         return result
     }
+    @Deprecated("not compaitable with sorted list")
     override fun addAll(elements: Collection<Completion>): Boolean {
-        val result =
-            comps.addAll(
-                elements.map { Completion(it.units, desc = it.desc, timeStamp = it.timeStamp) }
-            )
-        comps.sort() // TODO super inefficient. I need to upgrade to a DB
-        return result
+
+        return false
     }
 
     override fun clear() = comps.clear()
