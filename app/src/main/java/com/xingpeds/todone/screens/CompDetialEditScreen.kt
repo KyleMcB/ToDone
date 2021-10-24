@@ -22,7 +22,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -52,7 +54,8 @@ fun CompDetailEditScreen(
     units: String,
     onTimeStamp: (LocalDateTime) -> Unit,
     onDesc: (String) -> Unit,
-    onUnits: (Int) -> Unit
+    onUnits: (Int) -> Unit,
+    onDelete: () -> Unit
 ) {
     Screen(
         comp.desc.text,
@@ -61,7 +64,8 @@ fun CompDetailEditScreen(
         comp.timeStamp,
         onDesc = onDesc,
         onUnits = onUnits,
-        onTimeStamp = onTimeStamp
+        onTimeStamp = onTimeStamp,
+        onDelete = onDelete
     )
 }
 
@@ -73,7 +77,8 @@ private fun Screen(
     timeStamp: Instant,
     onDesc: (String) -> Unit = {},
     onUnits: (Int) -> Unit = {},
-    onTimeStamp: (LocalDateTime) -> Unit = {}
+    onTimeStamp: (LocalDateTime) -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
     var unitString by remember { mutableStateOf(units.toString()) }
     var localUnits by remember { mutableStateOf(units) }
@@ -142,7 +147,7 @@ private fun Screen(
             onTimeStamp(newDateTime)
         }
     }
-
+    var edited by remember { mutableStateOf(false) }
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround,
@@ -153,8 +158,20 @@ private fun Screen(
             value = localDescription,
             onValueChange = { localDescription = it },
             label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth().onFocusChanged { onDesc(localDescription) },
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            modifier =
+                Modifier.fillMaxWidth().onFocusChanged {
+                    if (edited) {
+                        onDesc(localDescription)
+                        edited = false
+                    }
+                },
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        edited = true
+                        focusManager.clearFocus()
+                    }
+                ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
         )
         Spacer(modifier = Modifier.padding(10.dp))
@@ -164,7 +181,13 @@ private fun Screen(
             isError = unitError,
             keyboardOptions =
                 KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        edited = true
+                        focusManager.clearFocus()
+                    }
+                ),
             onValueChange = {
                 unitString = it
 
@@ -178,7 +201,13 @@ private fun Screen(
                     }
             },
             label = { Text(unitType) },
-            modifier = Modifier.fillMaxWidth().onFocusChanged { onUnits(localUnits) }
+            modifier =
+                Modifier.fillMaxWidth().onFocusChanged {
+                    if (edited) {
+                        onUnits(localUnits)
+                        edited = false
+                    }
+                }
         )
         Spacer(modifier = Modifier.padding(10.dp))
 
@@ -194,17 +223,29 @@ private fun Screen(
 
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text("Time: ${timeStamp.toReadbleTime()}")
-            FloatingActionButton(
-                onClick = { /*TODO launch time picker*/
-                    timeDialog.show()
-                }
-            ) { Icon(Icons.Default.Schedule, contentDescription = null) }
+            FloatingActionButton(onClick = { timeDialog.show() }) {
+                Icon(Icons.Default.Schedule, contentDescription = null)
+            }
         }
         Spacer(modifier = Modifier.padding(10.dp))
+        var deleteDialog: Boolean by remember { mutableStateOf(false) }
         FloatingActionButton(
-            onClick = { /*TODO delete task*/},
+            onClick = { deleteDialog = true },
             backgroundColor = MaterialTheme.colors.error
         ) { Icon(Icons.Default.DeleteForever, null) }
+        if (deleteDialog) {
+            Dialog(onDismissRequest = { deleteDialog = false }) {
+                Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colors.error) {
+                    Column() {
+                        Text("Delete the completion?")
+                        Row(horizontalArrangement = Arrangement.End) {
+                            TextButton(onClick = { deleteDialog = false }) { Text("Cancel") }
+                            TextButton(onClick = { onDelete() }) { Text("Delete") }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
