@@ -62,37 +62,50 @@ class MainActivity : ComponentActivity() {
                         taskId?.let { idString ->
                             val task = model.list.find { it.id == UUID.fromString(idString) }
                             requireNotNull(task)
+                            var task_s by remember { mutableStateOf(task, neverEqualPolicy()) }
                             compId?.let { instantString ->
                                 val timeStamp = Instant.parse(instantString)
-                                val comp = task.find { it.timeStamp == timeStamp }
+                                val comp = task_s.find { it.timeStamp == timeStamp }
                                 if (comp == null) {} else {
                                     CompDetailEditScreen(
                                         dataModel = model,
                                         navController = navController,
                                         comp = comp,
-                                        units = task.unit,
+                                        units = task_s.unit,
                                         onTimeStamp = { time: LocalDateTime ->
-                                            task.remove(comp)
-                                            task.add(
+                                            task_s.remove(comp)
+                                            val newComp =
                                                 comp.copy(
                                                     timeStamp =
                                                         time.toInstant(
                                                             TimeZone.currentSystemDefault()
                                                         )
                                                 )
-                                            )
+                                            task_s.add(newComp)
+                                            task_s = task_s
+                                            navController.navigate(
+                                                addressOfCompEditDetialScreen(task, newComp)
+                                            ) { popUpTo(compListScreenRoute) }
                                         },
                                         onDesc = { desc: String ->
-                                            val old = task.remove(comp)
-                                            task.add(
+                                            val old = task_s.remove(comp)
+                                            task_s.add(
                                                 comp.copy(
                                                     desc = Description(desc, comp.desc.picture)
                                                 )
                                             )
+                                            task_s = task_s
                                         },
                                         onUnits = { units: Int ->
-                                            task.remove(comp)
-                                            task.add(comp.copy(units = units))
+                                            task_s.remove(comp)
+                                            task_s.add(comp.copy(units = units))
+                                            task_s = task_s
+                                        },
+                                        onDelete = {
+                                            task_s.remove(comp)
+                                            task_s = task_s
+                                            model.save()
+                                            navController.popBackStack()
                                         }
                                     )
                                 }
