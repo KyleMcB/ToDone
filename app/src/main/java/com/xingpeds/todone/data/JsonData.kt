@@ -48,7 +48,7 @@ data class TaskJson(
     override var unit: String,
     override var defaultAmount: Int,
     @Serializable(with = UUIDSerializer::class) override val id: UUID = UUID.randomUUID(),
-    override var daysWindow: Int = 7
+    override var daysWindow: Int = defaultWindowSize
 ) : Task {
 
     // this probably isn't going to serialize properly. need to do private constructor trick

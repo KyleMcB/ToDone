@@ -54,10 +54,6 @@ sealed interface Task : MutableSet<Completion> {
     abstract override fun hashCode(): Int
 }
 
-@Deprecated("this is a daily average")
-val Task.avgLastWindow: Float
-    get() = unitsInLastWindow.toFloat() / daysWindow
-
 val Task.regularity: Float
     get() = if (stdDev == 0f) 0f else (1 - (stdDev / avgUnitPerWindow)) * 100f
 
