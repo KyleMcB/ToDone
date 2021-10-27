@@ -42,20 +42,19 @@ fun ListItemLayout(
     modifier: Modifier,
     text: @Composable () -> Unit,
     overlineText: @Composable () -> Unit,
-    trailing: @Composable () -> Unit,
+    trailing: @Composable RowScope.() -> Unit,
     secondaryText: @Composable () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(10.dp).fillMaxWidth().then(modifier)
+        modifier = Modifier.padding(10.dp).fillMaxWidth(1f).then(modifier)
     ) {
-        Column(modifier = Modifier.padding(15.dp)) {
+        Column(modifier = Modifier.padding(15.dp).weight(2f)) {
             ProvideTextStyle(value = MaterialTheme.typography.overline, overlineText)
             ProvideTextStyle(value = MaterialTheme.typography.subtitle1, text)
             ProvideTextStyle(value = MaterialTheme.typography.body2, secondaryText)
         }
-        // why isn't this at the end?
         trailing()
     }
 }

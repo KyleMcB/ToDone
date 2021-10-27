@@ -71,12 +71,6 @@ internal class TaskJsonTest {
     }
 
     @Test
-    fun addAll() {
-        taskNoComps.addAll(listOf(completion1, completion2))
-        assert(taskNoComps.size == 2)
-    }
-
-    @Test
     fun clear() {
         taskTwocomp.clear()
         assert(taskTwocomp.size == 0)
