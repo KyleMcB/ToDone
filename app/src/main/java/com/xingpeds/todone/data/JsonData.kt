@@ -93,8 +93,16 @@ data class TaskJson(
     override val unitsInLastWindow: Int
         get() = this.compsLastWindow.sumOf { it.units }
 
+    private var stdDevMemo: Float? = null
+    private var stdDevMemoKey: Int? = null
     override val stdDev: Float
         get() {
+
+            val localMemo = stdDevMemo
+            val localKey = stdDevMemoKey
+            if (localMemo != null && localKey == size) {
+                return localMemo
+            }
             // if we only have 1 or 0 data points or if they are all in the same windows -> escape
             // hatch
             if (this.size < 2 || unitsPerWindow.size < 2) return 0f
@@ -105,7 +113,10 @@ data class TaskJson(
                     val deviation = windows[it] - mean
                     (deviation * deviation)
                 }
-            return sqrt(windowDeviations.sum() / (windowDeviations.size - 1f))
+            return sqrt(windowDeviations.sum() / (windowDeviations.size - 1f)).also { dev ->
+                stdDevMemo = dev
+                stdDevMemoKey = size
+            }
         }
 
     override val unitsPerWindow: List<Int>
