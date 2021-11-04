@@ -28,10 +28,6 @@ import com.xingpeds.todone.data.Completion
 import com.xingpeds.todone.data.Description
 import com.xingpeds.todone.data.Task
 import com.xingpeds.todone.data.regularity
-import com.xingpeds.todone.rate.Immature
-import com.xingpeds.todone.rate.rateLastWindow
-import com.xingpeds.todone.textGraph.TextGraph
-import com.xingpeds.todone.textGraph.TextLine
 import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.*
@@ -102,17 +98,6 @@ fun DetailTaskScreen(dataModel: DataModel, navController: NavController, task: T
                 }
             )
             Divider(modifier = Modifier.padding(10.dp))
-            if (task.rateLastWindow() !is Immature && task.regularity > 0) {
-                TextLine { length ->
-                    TextGraph(
-                        length = length,
-                        current = task.unitsInLastWindow.toFloat(),
-                        avg = task.avgUnitPerWindow,
-                        stdDev = task.stdDev
-                    )
-                }
-                Divider(modifier = Modifier.padding(10.dp))
-            }
 
             Text("completed ${task.numOfCompsLastWindow} times in last ${task.daysWindow} days")
             Text("total of ${task.unitsInLastWindow} ${task.unit} in last ${task.daysWindow} days")
