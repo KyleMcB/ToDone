@@ -159,7 +159,7 @@ class MainActivity : ComponentActivity() {
                         StorageScreen(
                             dataModel = model,
                             navController = navController,
-                            onImport = { importer.launch(arrayOf("application/json")) },
+                            onImport = { importer.launch(arrayOf("*/*")) },
                             onExport = { exporter.launch("data.json") }
                         )
                     }
